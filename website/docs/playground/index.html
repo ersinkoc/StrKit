@@ -407,8 +407,8 @@ console.log('Slugify DE:', str.sanitize.slugify('Grosse Strasse'));`
 
         try {
           const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-          const fn = new AsyncFunction('strkit', 'str', 'S', code);
-          await fn(window.strkit, window.strkit?.str, window.strkit?.S);
+          const fn = new AsyncFunction('strkit', code);
+          await fn(window.strkit);
         } catch (error) {
           appendOutput('Error: ' + error.message, 'error');
         }
