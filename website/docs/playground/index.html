@@ -8,126 +8,135 @@
   <script>
     tailwind.config = {
       darkMode: 'class',
-      theme: { extend: { colors: { primary: '#6366f1' } } }
+      theme: { extend: { colors: { primary: '#6366f1', secondary: '#8b5cf6' } } }
     }
   </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-  <!-- CodeMirror -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/material-darker.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/javascript/javascript.min.js"></script>
-
   <style>
-    .CodeMirror {
-      height: 100%;
-      font-family: 'Fira Code', monospace;
-      font-size: 14px;
-      background: #1a1a2e;
-      border-radius: 0.5rem;
-    }
-    .CodeMirror-gutters {
-      background: #1a1a2e;
-      border: none;
-    }
+    .loader { border: 3px solid #374151; border-top: 3px solid #6366f1; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen" x-data="playground()">
+<body class="bg-gray-950 text-gray-100 min-h-screen">
 
   <!-- Nav -->
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-lg border-b border-gray-800">
-    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/90 backdrop-blur-lg border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
       <a href="/" class="flex items-center space-x-2">
-        <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        <span class="text-xl font-bold">StrKit</span>
+        <svg class="w-7 h-7 text-primary" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span class="text-lg font-bold">StrKit</span>
       </a>
-      <div class="flex items-center space-x-4">
-        <select x-model="selectedExample" @change="loadExample()" class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
-          <option value="">Select Example...</option>
-          <option value="case">Case Conversion</option>
-          <option value="validation">Validation</option>
-          <option value="chain">Chainable API</option>
-          <option value="similarity">Similarity</option>
-          <option value="diff">Diff</option>
-          <option value="i18n">i18n / Locale</option>
-        </select>
-        <button @click="runCode()" class="px-4 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition flex items-center space-x-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <span>Run</span>
-        </button>
+      <div class="hidden md:flex items-center space-x-6 text-sm">
+        <a href="/docs/" class="text-gray-400 hover:text-white transition">Docs</a>
+        <a href="/docs/api/" class="text-gray-400 hover:text-white transition">API</a>
+        <a href="/docs/examples/" class="text-gray-400 hover:text-white transition">Examples</a>
+        <a href="/docs/playground/" class="text-white font-medium">Playground</a>
       </div>
     </div>
   </nav>
 
-  <div class="pt-16 h-screen flex flex-col">
-    <div class="flex-1 flex">
-      <!-- Editor -->
-      <div class="w-1/2 border-r border-gray-800 flex flex-col">
-        <div class="px-4 py-2 bg-gray-900 border-b border-gray-800 text-sm text-gray-400">
-          Code Editor
+  <!-- Loading Screen -->
+  <div id="loading" class="fixed inset-0 bg-gray-950 flex items-center justify-center z-40">
+    <div class="text-center">
+      <div class="loader mx-auto mb-4"></div>
+      <p class="text-gray-400">Loading StrKit Playground...</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="app" class="pt-14 h-screen flex flex-col" style="display: none;">
+    <!-- Toolbar -->
+    <div class="h-12 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-4">
+      <div class="flex items-center space-x-3">
+        <select id="examples" class="bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-primary">
+          <option value="case">Case Conversion</option>
+          <option value="validation">Validation</option>
+          <option value="chain">Chainable API</option>
+          <option value="manipulation">String Manipulation</option>
+          <option value="similarity">Similarity</option>
+          <option value="diff">Diff & Patch</option>
+          <option value="formatting">Formatting</option>
+          <option value="i18n">i18n / Locale</option>
+        </select>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button id="clearBtn" class="px-3 py-1.5 text-sm text-gray-400 hover:text-white transition">
+          Clear
+        </button>
+        <button id="runBtn" class="px-4 py-1.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded transition flex items-center space-x-2">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+          <span>Run</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Editor & Output -->
+    <div class="flex-1 flex overflow-hidden">
+      <!-- Editor Panel -->
+      <div class="w-1/2 flex flex-col border-r border-gray-800">
+        <div class="h-8 bg-gray-900/50 border-b border-gray-800 flex items-center px-3">
+          <span class="text-xs text-gray-500">editor.js</span>
+          <span class="ml-auto text-xs text-gray-600">Ctrl+Enter to run</span>
         </div>
-        <div class="flex-1 p-2">
-          <textarea id="code-editor"></textarea>
-        </div>
+        <div id="editor" class="flex-1"></div>
       </div>
 
-      <!-- Output -->
-      <div class="w-1/2 flex flex-col">
-        <div class="px-4 py-2 bg-gray-900 border-b border-gray-800 text-sm text-gray-400 flex justify-between">
-          <span>Output</span>
-          <button @click="clearOutput()" class="text-gray-500 hover:text-white">Clear</button>
+      <!-- Output Panel -->
+      <div class="w-1/2 flex flex-col bg-gray-900/30">
+        <div class="h-8 bg-gray-900/50 border-b border-gray-800 flex items-center px-3">
+          <span class="text-xs text-gray-500">Console Output</span>
         </div>
-        <div class="flex-1 p-4 bg-gray-900/50 overflow-auto font-mono text-sm">
-          <template x-for="(line, index) in output" :key="index">
-            <div :class="line.type === 'error' ? 'text-red-400' : 'text-green-400'" x-text="line.text"></div>
-          </template>
-          <div x-show="output.length === 0" class="text-gray-500">
-            Click "Run" to execute your code...
-          </div>
+        <div id="output" class="flex-1 p-4 overflow-auto font-mono text-sm space-y-1">
+          <div class="text-gray-500">// Press "Run" or Ctrl+Enter to execute...</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Load StrKit from unpkg -->
-  <script src="https://unpkg.com/@oxog/strkit@latest/dist/index.mjs" type="module"></script>
+  <!-- Monaco Editor -->
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
 
   <script type="module">
-    // Import StrKit
-    import * as strkit from 'https://unpkg.com/@oxog/strkit@latest/dist/index.mjs';
-
-    // Make it available globally for the playground
-    window.strkit = strkit;
-    window.str = strkit.str;
-    window.S = strkit.S;
-
     // Examples
     const examples = {
-      case: `// Case Conversion Examples
+      case: `// Case Conversion - Transform string cases easily
 const { str, S } = strkit;
 
-console.log(str.case.camel('hello world'));     // helloWorld
-console.log(str.case.kebab('helloWorld'));      // hello-world
-console.log(str.case.snake('helloWorld'));      // hello_world
-console.log(str.case.pascal('hello world'));    // HelloWorld
-console.log(str.case.title('hello world'));     // Hello World
+// Namespace API
+console.log('camelCase:', str.case.camel('hello world'));
+console.log('kebab-case:', str.case.kebab('helloWorld'));
+console.log('snake_case:', str.case.snake('helloWorld'));
+console.log('PascalCase:', str.case.pascal('hello world'));
+console.log('Title Case:', str.case.title('hello world'));
+console.log('CONSTANT_CASE:', str.case.constant('hello world'));
 
-// Chainable
-console.log(S('hello world').camelCase().value);`,
+// Chainable API
+console.log('\\nChainable:', S('  Hello World  ').trim().camelCase().value);
 
-      validation: `// Validation Examples
+// Turkish locale support
+console.log('\\nTurkish upper:', str.case.upper('istanbul', { locale: 'tr' }));`,
+
+      validation: `// Validation - Validate strings with ease
 const { str, S } = strkit;
 
-console.log(str.validate.email('test@example.com'));   // true
-console.log(str.validate.url('https://example.com'));  // true
-console.log(str.validate.uuid('550e8400-e29b-41d4-a716-446655440000')); // true
-console.log(str.validate.ip('192.168.1.1'));           // true
+// Email validation
+console.log('Email valid:', str.validate.email('user@example.com'));
+console.log('Email invalid:', str.validate.email('not-an-email'));
 
-// Chainable returns boolean
-console.log(S('test@example.com').isEmail());  // true`,
+// URL validation
+console.log('\\nURL valid:', str.validate.url('https://example.com'));
+console.log('URL invalid:', str.validate.url('not-a-url'));
 
-      chain: `// Chainable API Examples
+// Other validators
+console.log('\\nUUID:', str.validate.uuid('550e8400-e29b-41d4-a716-446655440000'));
+console.log('IPv4:', str.validate.ipv4('192.168.1.1'));
+console.log('IPv6:', str.validate.ipv6('::1'));
+console.log('Credit Card:', str.validate.creditCard('4111111111111111'));
+
+// Chainable validation
+console.log('\\nChain isEmail:', S('test@test.com').isEmail());
+console.log('Chain isEmpty:', S('').isEmpty());`,
+
+      chain: `// Chainable API - Fluent string manipulation
 const { S } = strkit;
 
 // Chain multiple operations
@@ -135,108 +144,292 @@ const result = S('  Hello World  ')
   .trim()
   .lower()
   .camelCase()
-  .truncate(8)
   .value;
+console.log('Chained result:', result);
 
-console.log(result);  // helloW...
+// Immutability
+const original = S('hello');
+const modified = original.upper();
+console.log('\\nOriginal:', original.value);
+console.log('Modified:', modified.value);
 
-// Immutable
-const a = S('hello');
-const b = a.upper();
-console.log(a.value);  // hello (unchanged)
-console.log(b.value);  // HELLO`,
+// Complex pipeline
+const slug = S('  This is a Blog Post Title!  ')
+  .trim()
+  .slugify()
+  .value;
+console.log('\\nGenerated slug:', slug);
 
-      similarity: `// Similarity Examples
+// Analysis methods
+const text = S('Hello World');
+console.log('\\nWord count:', text.wordCount());
+console.log('Char count:', text.charCount());`,
+
+      manipulation: `// String Manipulation - Powerful string operations
+const { str, S } = strkit;
+
+// Basic operations
+console.log('Trim:', str.manipulation.trim('  hello  '));
+console.log('Reverse:', str.manipulation.reverse('hello'));
+console.log('Repeat:', str.manipulation.repeat('ha', 3));
+
+// Truncate
+console.log('\\nTruncate:', str.manipulation.truncate('Hello World', 8, '...'));
+
+// Wrap/Unwrap
+console.log('Wrap:', str.manipulation.wrap('content', '<div>', '</div>'));
+console.log('Unwrap:', str.manipulation.unwrap('<div>content</div>', '<div>', '</div>'));
+
+// Between/Before/After
+const url = 'https://example.com/path?query=1';
+console.log('\\nBetween:', str.manipulation.between(url, '://', '/'));
+console.log('Before:', str.manipulation.before(url, '?'));
+console.log('After:', str.manipulation.after(url, '://'));
+
+// Split utilities
+console.log('\\nWords:', str.manipulation.words('Hello World Test'));
+console.log('Lines:', str.manipulation.lines('a\\nb\\nc'));`,
+
+      similarity: `// Similarity - Compare and match strings
 const { str } = strkit;
 
-console.log(str.similarity.levenshtein('kitten', 'sitting'));  // 3
-console.log(str.similarity.dice('night', 'nacht'));            // 0.25
-console.log(str.similarity.jaroWinkler('DWAYNE', 'DUANE'));    // ~0.84
+// Distance algorithms
+console.log('Levenshtein:', str.similarity.levenshtein('kitten', 'sitting'));
+console.log('Hamming:', str.similarity.hamming('karolin', 'kathrin'));
+
+// Similarity scores (0-1)
+console.log('\\nDice coefficient:', str.similarity.dice('night', 'nacht'));
+console.log('Jaro-Winkler:', str.similarity.jaroWinkler('DWAYNE', 'DUANE').toFixed(3));
+console.log('Cosine:', str.similarity.cosine('hello world', 'hello there').toFixed(3));
 
 // Find best match
-const result = str.similarity.bestMatch('hello', ['hallo', 'hullo', 'hey']);
-console.log(result);`,
+const options = ['apple', 'banana', 'orange', 'grape'];
+const best = str.similarity.bestMatch('aple', options);
+console.log('\\nBest match for "aple":', best);
 
-      diff: `// Diff Examples
+// Find similar
+const similar = str.similarity.findSimilar('helo', ['hello', 'world', 'help'], { threshold: 0.5 });
+console.log('Similar to "helo":', similar);`,
+
+      diff: `// Diff & Patch - Compare and patch text
 const { str } = strkit;
 
-const diff = str.diff.diffChars('hello', 'hallo');
-console.log(JSON.stringify(diff, null, 2));
+// Character diff
+const charDiff = str.diff.diffChars('hello', 'hallo');
+console.log('Char diff:');
+charDiff.forEach(d => console.log('  ' + d.type + ':', JSON.stringify(d.value)));
 
-const wordDiff = str.diff.diffWords('hello world', 'hello there');
-console.log(JSON.stringify(wordDiff, null, 2));`,
+// Word diff
+console.log('\\nWord diff:');
+const wordDiff = str.diff.diffWords('hello world', 'hello universe');
+wordDiff.forEach(d => console.log('  ' + d.type + ':', JSON.stringify(d.value)));
 
-      i18n: `// i18n Examples
-const { str, setLocale } = strkit;
+// Line diff
+console.log('\\nLine diff:');
+const lineDiff = str.diff.diffLines('line1\\nline2', 'line1\\nline3');
+lineDiff.forEach(d => console.log('  ' + d.type + ':', JSON.stringify(d.value)));
 
-// Turkish locale
-console.log(str.case.upper('istanbul', { locale: 'tr' }));  // İSTANBUL
-console.log(str.case.lower('ISTANBUL', { locale: 'tr' }));  // ıstanbul
+// Create unified patch
+const patch = str.diff.createPatch('file.txt', 'old content', 'new content');
+console.log('\\nUnified Patch:');
+console.log(patch);`,
 
-// Slugify with locale
-console.log(str.sanitize.slugify('Türkçe Başlık', { locale: 'tr' }));
+      formatting: `// Formatting - Format strings and numbers
+const { str } = strkit;
+
+// Template formatting
+const result = str.format.template('Hello, {name}! You have {count} messages.', {
+  name: 'John',
+  count: 5
+});
+console.log('Template:', result);
+
+// sprintf style
+console.log('\\nsprintf:', str.format.sprintf('Name: %s, Age: %d', 'Alice', 30));
+console.log('sprintf hex:', str.format.sprintf('Color: #%06x', 16711680));
+
+// Number formatting
+console.log('\\nNumber:', str.format.number(1234567.89));
+console.log('Currency:', str.format.currency(1234.56, { currency: 'USD' }));
+
+// Ordinalize
+console.log('\\nOrdinal 1:', str.format.ordinalize(1));
+console.log('Ordinal 2:', str.format.ordinalize(2));
+console.log('Ordinal 3:', str.format.ordinalize(3));
+console.log('Ordinal 11:', str.format.ordinalize(11));
+
+// Mask
+console.log('\\nMasked:', str.format.mask('1234567890', '(###) ###-####'));`,
+
+      i18n: `// i18n / Locale - Internationalization support
+const { str } = strkit;
+
+// Turkish locale - special i/I handling
+console.log('Turkish uppercase:', str.case.upper('istanbul', { locale: 'tr' }));
+console.log('Turkish lowercase:', str.case.lower('ISTANBUL', { locale: 'tr' }));
+
+// Compare with English
+console.log('\\nEnglish uppercase:', str.case.upper('istanbul', { locale: 'en' }));
+console.log('English lowercase:', str.case.lower('ISTANBUL', { locale: 'en' }));
 
 // Transliteration
-console.log(str.sanitize.latinise('Héllo Wörld'));`
+console.log('\\nLatinise French:', str.sanitize.latinise('Cafe resume'));
+console.log('Latinise German:', str.sanitize.latinise('Grosse'));
+console.log('Latinise Polish:', str.sanitize.latinise('Czesc'));
+
+// Transliterate from different scripts
+console.log('\\nRussian:', str.sanitize.transliterate('Privet mir', 'ru'));
+console.log('Japanese:', str.sanitize.transliterate('konnichiha', 'ja'));
+
+// Slugify with locale
+console.log('\\nSlugify TR:', str.sanitize.slugify('Turkce Baslik'));
+console.log('Slugify DE:', str.sanitize.slugify('Grosse Strasse'));`
     };
 
-    // Alpine component
-    document.addEventListener('alpine:init', () => {
-      Alpine.data('playground', () => ({
-        editor: null,
-        output: [],
-        selectedExample: '',
+    // Wait for Monaco to load
+    require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
 
-        init() {
-          this.editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
-            mode: 'javascript',
-            theme: 'material-darker',
-            lineNumbers: true,
-            tabSize: 2,
-            indentWithTabs: false,
-          });
+    // Load StrKit
+    let strkitLoaded = false;
+    try {
+      const module = await import('https://unpkg.com/@oxog/strkit@latest/dist/index.mjs');
+      window.strkit = module;
+      strkitLoaded = true;
+    } catch (e) {
+      console.error('Failed to load StrKit:', e);
+    }
 
-          this.editor.setValue(examples.case);
-
-          // Override console.log
-          const self = this;
-          const originalLog = console.log;
-          console.log = function(...args) {
-            self.output.push({
-              type: 'log',
-              text: args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' ')
-            });
-            originalLog.apply(console, args);
-          };
-        },
-
-        loadExample() {
-          if (this.selectedExample && examples[this.selectedExample]) {
-            this.editor.setValue(examples[this.selectedExample]);
-          }
-        },
-
-        runCode() {
-          this.output = [];
-          const code = this.editor.getValue();
-
-          try {
-            // Execute the code
-            const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-            const fn = new AsyncFunction('strkit', 'str', 'S', 'setLocale', code);
-            fn(window.strkit, window.strkit.str, window.strkit.S, window.strkit.setLocale);
-          } catch (error) {
-            this.output.push({
-              type: 'error',
-              text: 'Error: ' + error.message
-            });
-          }
-        },
-
-        clearOutput() {
-          this.output = [];
+    require(['vs/editor/editor.main'], function () {
+      // Define dark theme
+      monaco.editor.defineTheme('strkit-dark', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [
+          { token: 'comment', foreground: '6b7280' },
+          { token: 'string', foreground: 'a5d6ff' },
+          { token: 'keyword', foreground: 'c678dd' },
+          { token: 'number', foreground: 'e5c07b' },
+        ],
+        colors: {
+          'editor.background': '#0d1117',
+          'editor.foreground': '#e6edf3',
+          'editor.lineHighlightBackground': '#161b22',
+          'editorLineNumber.foreground': '#484f58',
+          'editorLineNumber.activeForeground': '#e6edf3',
+          'editor.selectionBackground': '#264f78',
+          'editorCursor.foreground': '#6366f1',
         }
-      }));
+      });
+
+      // Create editor
+      const editor = monaco.editor.create(document.getElementById('editor'), {
+        value: examples.case,
+        language: 'javascript',
+        theme: 'strkit-dark',
+        fontSize: 14,
+        fontFamily: "'Fira Code', 'Cascadia Code', Consolas, monospace",
+        fontLigatures: true,
+        minimap: { enabled: false },
+        scrollBeyondLastLine: false,
+        automaticLayout: true,
+        tabSize: 2,
+        wordWrap: 'on',
+        padding: { top: 16, bottom: 16 },
+        lineNumbers: 'on',
+        renderLineHighlight: 'all',
+        cursorBlinking: 'smooth',
+        smoothScrolling: true,
+      });
+
+      // Add strkit type hints
+      monaco.languages.typescript.javascriptDefaults.addExtraLib(`
+        declare const strkit: any;
+        declare const str: any;
+        declare const S: (input: string) => any;
+      `);
+
+      const outputEl = document.getElementById('output');
+      const examplesSelect = document.getElementById('examples');
+      const runBtn = document.getElementById('runBtn');
+      const clearBtn = document.getElementById('clearBtn');
+
+      // Output functions - using safe DOM methods
+      function clearOutput() {
+        while (outputEl.firstChild) {
+          outputEl.removeChild(outputEl.firstChild);
+        }
+      }
+
+      function appendOutput(text, type = 'log') {
+        const line = document.createElement('div');
+        if (type === 'error') {
+          line.className = 'text-red-400';
+        } else if (type === 'warn') {
+          line.className = 'text-yellow-400';
+        } else {
+          line.className = 'text-emerald-400';
+        }
+        line.textContent = text;
+        outputEl.appendChild(line);
+        outputEl.scrollTop = outputEl.scrollHeight;
+      }
+
+      // Run code
+      async function runCode() {
+        clearOutput();
+        const code = editor.getValue();
+
+        // Override console
+        const originalConsole = { ...console };
+        console.log = (...args) => {
+          const text = args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' ');
+          appendOutput(text, 'log');
+          originalConsole.log(...args);
+        };
+        console.error = (...args) => {
+          const text = args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
+          appendOutput(text, 'error');
+          originalConsole.error(...args);
+        };
+        console.warn = (...args) => {
+          const text = args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
+          appendOutput(text, 'warn');
+          originalConsole.warn(...args);
+        };
+
+        try {
+          const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+          const fn = new AsyncFunction('strkit', 'str', 'S', code);
+          await fn(window.strkit, window.strkit?.str, window.strkit?.S);
+        } catch (error) {
+          appendOutput('Error: ' + error.message, 'error');
+        }
+
+        // Restore console
+        Object.assign(console, originalConsole);
+      }
+
+      // Event listeners
+      runBtn.addEventListener('click', runCode);
+      clearBtn.addEventListener('click', () => {
+        clearOutput();
+        appendOutput('// Console cleared', 'log');
+      });
+
+      examplesSelect.addEventListener('change', (e) => {
+        const example = examples[e.target.value];
+        if (example) {
+          editor.setValue(example);
+          clearOutput();
+        }
+      });
+
+      // Keyboard shortcut
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, runCode);
+
+      // Hide loading, show app
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
     });
   </script>
 </body>
