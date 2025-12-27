@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom utility classes */
+@layer utilities {
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  }
+
+  .gradient-border {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+  }
+
+  .glass {
+    @apply bg-gray-900/85 backdrop-blur-xl;
+  }
+
+  .glow {
+    box-shadow: 0 0 60px rgba(99, 102, 241, 0.2);
+  }
+
+  .glow-hover:hover {
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.25);
+  }
+}
+
+/* Code block styles */
+.code-block {
+  @apply bg-[#0d1117] border border-[#30363d] rounded-xl overflow-hidden;
+}
+
+.code-header {
+  @apply flex items-center justify-between px-4 py-3 bg-[#161b22] border-b border-[#30363d];
+}
+
+/* Syntax highlighting tokens */
+.token-keyword { color: #ff7b72; }
+.token-string { color: #a5d6ff; }
+.token-function { color: #d2a8ff; }
+.token-comment { color: #8b949e; font-style: italic; }
+.token-number { color: #79c0ff; }
+.token-property { color: #7ee787; }
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-600 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
+}
+
+/* Sidebar link styles */
+.sidebar-link {
+  @apply flex items-center px-3 py-2 rounded-lg text-gray-400 text-sm transition-all duration-150;
+}
+
+.sidebar-link:hover {
+  @apply text-gray-100 bg-primary-500/10;
+}
+
+.sidebar-link.active {
+  @apply text-primary-400 bg-primary-500/15 font-medium;
+}
+
+/* Method card styles */
+.method-card {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.6) 0%, rgba(31, 41, 55, 0.4) 100%);
+  @apply border border-gray-700/30 rounded-2xl transition-all duration-200;
+}
+
+.method-card:hover {
+  @apply border-primary-500/30;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* TOC link styles */
+.toc-link {
+  @apply block py-1 text-gray-400 text-sm border-l-2 border-transparent pl-3 -ml-0.5 transition-all duration-150;
+}
+
+.toc-link:hover {
+  @apply text-gray-100 border-primary-500/50;
+}
+
+/* Card shine effect */
+.card-shine {
+  @apply relative overflow-hidden;
+}
+
+.card-shine::before {
+  content: '';
+  @apply absolute top-0 -left-full w-full h-full transition-all duration-500;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+}
+
+.card-shine:hover::before {
+  left: 100%;
+}
+
+/* Animation delays */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* Demo input styles */
+.demo-input {
+  @apply bg-gray-800/50 border border-gray-700/50 transition-all duration-200;
+}
+
+.demo-input:focus {
+  @apply border-primary-500 outline-none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Copy button styles */
+.copy-btn {
+  @apply flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200;
+  @apply bg-primary-500/10 border border-primary-500/30 text-primary-300;
+}
+
+.copy-btn:hover {
+  @apply bg-primary-500/20 border-primary-500/50 text-primary-200;
+}
+
+.copy-btn.copied {
+  @apply bg-green-500/20 border-green-500/50 text-green-300;
+}
+
+/* Method badge styles */
+.method-badge {
+  @apply inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full font-mono;
+}
+
+/* Scroll progress indicator */
+.scroll-progress {
+  @apply fixed top-0 left-0 h-0.5 bg-gradient-to-r from-primary-500 to-accent-500 z-50;
+  transform-origin: left;
+}
+
+/* Back to top button */
+.back-to-top {
+  @apply fixed bottom-6 right-6 w-12 h-12 rounded-full flex items-center justify-center z-40;
+  @apply bg-primary-600 hover:bg-primary-500 text-white shadow-lg shadow-primary-600/30;
+  @apply transition-all duration-300;
+}
+
+.back-to-top.hidden {
+  @apply opacity-0 pointer-events-none translate-y-4;
+}
+
+/* Toast notification */
+.toast {
+  @apply fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl z-50;
+  @apply bg-gray-800 border border-gray-700 text-white shadow-2xl;
+  @apply transform transition-all duration-300;
+}
+
+.toast.hidden {
+  @apply opacity-0 translate-y-4 pointer-events-none;
+}
