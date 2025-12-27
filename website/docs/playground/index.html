@@ -289,14 +289,22 @@ console.log('Slugify DE:', str.sanitize.slugify('Grosse Strasse'));`
     // Wait for Monaco to load
     require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
 
-    // Load StrKit
+    // Load StrKit - try local first, then fallback to unpkg
     let strkitLoaded = false;
     try {
-      const module = await import('https://unpkg.com/@oxog/strkit@latest/dist/index.mjs');
+      // Try local dist first
+      const module = await import('/dist/index.mjs');
       window.strkit = module;
       strkitLoaded = true;
-    } catch (e) {
-      console.error('Failed to load StrKit:', e);
+    } catch (e1) {
+      try {
+        // Fallback to unpkg
+        const module = await import('https://unpkg.com/@oxog/strkit@latest/dist/index.mjs');
+        window.strkit = module;
+        strkitLoaded = true;
+      } catch (e2) {
+        console.error('Failed to load StrKit:', e2);
+      }
     }
 
     require(['vs/editor/editor.main'], function () {
