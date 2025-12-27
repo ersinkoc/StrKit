@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="dark scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -84,6 +84,35 @@
       border-bottom: 1px solid #30363d;
     }
 
+    .copy-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.375rem 0.75rem;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 0.5rem;
+      color: #a5b4fc;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .copy-btn:hover {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: rgba(99, 102, 241, 0.5);
+      color: #c7d2fe;
+    }
+    .copy-btn.copied {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: rgba(34, 197, 94, 0.5);
+      color: #86efac;
+    }
+    .copy-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
     /* Syntax highlighting */
     .token-keyword { color: #ff7b72; }
     .token-string { color: #a5d6ff; }
@@ -139,6 +168,34 @@
       transform: translateY(-2px);
       box-shadow: 0 10px 40px rgba(99, 102, 241, 0.1);
     }
+
+    /* Smooth page transitions */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    .delay-300 { animation-delay: 300ms; }
+
+    /* Back to top button */
+    .back-to-top {
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .back-to-top.hidden {
+      opacity: 0;
+      transform: translateY(20px);
+      pointer-events: none;
+    }
+
+    /* Scroll indicator */
+    .scroll-progress {
+      transform-origin: left;
+      transition: transform 0.1s linear;
+    }
   </style>
 </head>
 <body class="bg-gray-950 text-gray-100 font-sans min-h-screen" x-data="{ mobileMenu: false, mobileSidebar: false, searchOpen: false }">
@@ -165,8 +222,13 @@
     </div>
   </div>
 
+  <!-- Scroll Progress Indicator -->
+  <div class="fixed top-0 left-0 right-0 z-[60] h-0.5 bg-gray-900">
+    <div id="scrollProgress" class="h-full bg-gradient-to-r from-primary-500 to-accent-500 scroll-progress" style="transform: scaleX(0);"></div>
+  </div>
+
   <!-- Navigation -->
-  <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-gray-800/50">
+  <nav class="fixed top-0.5 left-0 right-0 z-50 glass border-b border-gray-800/50">
     <div class="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <div class="flex items-center gap-8">
@@ -387,13 +449,19 @@
                       class="px-4 py-2 rounded-lg text-sm font-medium transition">bun</button>
             </div>
 
-            <div class="code-block">
+            <div class="code-block" x-data="{ copied: false }">
               <div class="code-header">
                 <span class="text-gray-400 text-sm font-medium">Terminal</span>
-                <button class="text-gray-400 hover:text-white transition" @click="navigator.clipboard.writeText($refs.installCmd.innerText)">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button @click="navigator.clipboard.writeText($refs.installCmd.innerText); copied = true; setTimeout(() => copied = false, 2000)"
+                        :class="{ 'copied': copied }"
+                        class="copy-btn">
+                  <svg x-show="!copied" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                   </svg>
+                  <svg x-show="copied" x-cloak fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  <span x-text="copied ? 'Copied!' : 'Copy'"></span>
                 </button>
               </div>
               <pre><code x-ref="installCmd" class="text-gray-100"><span x-show="tab === 'npm'">npm install @oxog/strkit</span><span x-show="tab === 'yarn'" x-cloak>yarn add @oxog/strkit</span><span x-show="tab === 'pnpm'" x-cloak>pnpm add @oxog/strkit</span><span x-show="tab === 'bun'" x-cloak>bun add @oxog/strkit</span></code></pre>
@@ -418,9 +486,20 @@
             </h3>
             <p class="text-gray-400 mb-4">Access all methods through organized namespaces for clean, readable code:</p>
 
-            <div class="code-block">
+            <div class="code-block" x-data="{ copied: false }">
               <div class="code-header">
                 <span class="text-gray-400 text-sm font-medium">TypeScript</span>
+                <button @click="copyCode($el); copied = true; setTimeout(() => copied = false, 2000)"
+                        :class="{ 'copied': copied }"
+                        class="copy-btn">
+                  <svg x-show="!copied" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  </svg>
+                  <svg x-show="copied" x-cloak fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  <span x-text="copied ? 'Copied!' : 'Copy'"></span>
+                </button>
               </div>
               <pre><code><span class="token-keyword">import</span> { str } <span class="token-keyword">from</span> <span class="token-string">'@oxog/strkit'</span>;
 
@@ -445,9 +524,20 @@ str.similarity.<span class="token-function">levenshtein</span>(<span class="toke
             </h3>
             <p class="text-gray-400 mb-4">Import only what you need for optimal bundle size:</p>
 
-            <div class="code-block">
+            <div class="code-block" x-data="{ copied: false }">
               <div class="code-header">
                 <span class="text-gray-400 text-sm font-medium">TypeScript</span>
+                <button @click="copyCode($el); copied = true; setTimeout(() => copied = false, 2000)"
+                        :class="{ 'copied': copied }"
+                        class="copy-btn">
+                  <svg x-show="!copied" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  </svg>
+                  <svg x-show="copied" x-cloak fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  <span x-text="copied ? 'Copied!' : 'Copy'"></span>
+                </button>
               </div>
               <pre><code><span class="token-keyword">import</span> { camelCase, isEmail, slugify } <span class="token-keyword">from</span> <span class="token-string">'@oxog/strkit'</span>;
 
@@ -465,9 +555,20 @@ str.similarity.<span class="token-function">levenshtein</span>(<span class="toke
             </h3>
             <p class="text-gray-400 mb-4">Fluent, immutable method chaining for complex transformations:</p>
 
-            <div class="code-block">
+            <div class="code-block" x-data="{ copied: false }">
               <div class="code-header">
                 <span class="text-gray-400 text-sm font-medium">TypeScript</span>
+                <button @click="copyCode($el); copied = true; setTimeout(() => copied = false, 2000)"
+                        :class="{ 'copied': copied }"
+                        class="copy-btn">
+                  <svg x-show="!copied" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  </svg>
+                  <svg x-show="copied" x-cloak fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  <span x-text="copied ? 'Copied!' : 'Copy'"></span>
+                </button>
               </div>
               <pre><code><span class="token-keyword">import</span> { S } <span class="token-keyword">from</span> <span class="token-string">'@oxog/strkit'</span>;
 
@@ -494,9 +595,20 @@ console.<span class="token-function">log</span>(b.value);  <span class="token-co
             </h3>
             <p class="text-gray-400 mb-4">Extend native String prototype for the most natural syntax:</p>
 
-            <div class="code-block">
+            <div class="code-block" x-data="{ copied: false }">
               <div class="code-header">
                 <span class="text-gray-400 text-sm font-medium">TypeScript</span>
+                <button @click="copyCode($el); copied = true; setTimeout(() => copied = false, 2000)"
+                        :class="{ 'copied': copied }"
+                        class="copy-btn">
+                  <svg x-show="!copied" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  </svg>
+                  <svg x-show="copied" x-cloak fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  <span x-text="copied ? 'Copied!' : 'Copy'"></span>
+                </button>
               </div>
               <pre><code><span class="token-keyword">import</span> <span class="token-string">'@oxog/strkit/extend'</span>;
 
@@ -523,9 +635,20 @@ console.<span class="token-function">log</span>(b.value);  <span class="token-co
 
           <p class="text-gray-400 mb-6">StrKit is written in TypeScript with complete type definitions:</p>
 
-          <div class="code-block">
+          <div class="code-block" x-data="{ copied: false }">
             <div class="code-header">
               <span class="text-gray-400 text-sm font-medium">TypeScript</span>
+              <button @click="copyCode($el); copied = true; setTimeout(() => copied = false, 2000)"
+                      :class="{ 'copied': copied }"
+                      class="copy-btn">
+                <svg x-show="!copied" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                <svg x-show="copied" x-cloak fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span x-text="copied ? 'Copied!' : 'Copy'"></span>
+              </button>
             </div>
             <pre><code><span class="token-keyword">import</span> {
   S,
@@ -652,6 +775,14 @@ console.<span class="token-function">log</span>(b.value);  <span class="token-co
         </nav>
       </div>
 
+      <!-- Back to Top Button -->
+      <button id="backToTop" class="back-to-top hidden fixed bottom-6 right-6 z-40 w-12 h-12 bg-primary-600 hover:bg-primary-500 text-white rounded-full shadow-lg shadow-primary-600/30 flex items-center justify-center transition"
+              onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+        </svg>
+      </button>
+
       <!-- Footer -->
       <footer class="border-t border-gray-800 mt-16">
         <div class="max-w-4xl mx-auto px-6 py-8">
@@ -675,13 +806,64 @@ console.<span class="token-function">log</span>(b.value);  <span class="token-co
     </main>
   </div>
 
-  <!-- Keyboard shortcuts -->
+  <!-- Keyboard shortcuts, scroll handling, and copy function -->
   <script>
+    // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         Alpine.store('searchOpen', true);
       }
+    });
+
+    // Copy code function
+    function copyCode(button) {
+      const codeBlock = button.closest('.code-block');
+      const code = codeBlock.querySelector('code').textContent;
+      navigator.clipboard.writeText(code).catch(err => {
+        console.error('Failed to copy:', err);
+      });
+    }
+
+    // Scroll progress and back-to-top
+    const scrollProgress = document.getElementById('scrollProgress');
+    const backToTop = document.getElementById('backToTop');
+
+    window.addEventListener('scroll', () => {
+      // Update scroll progress
+      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const progress = scrollTop / scrollHeight;
+      scrollProgress.style.transform = `scaleX(${progress})`;
+
+      // Show/hide back to top button
+      if (scrollTop > 400) {
+        backToTop.classList.remove('hidden');
+      } else {
+        backToTop.classList.add('hidden');
+      }
+    });
+
+    // Add fade-in animation to sections
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('section').forEach(section => {
+      section.style.opacity = '0';
+      section.style.transform = 'translateY(20px)';
+      section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      observer.observe(section);
     });
   </script>
 </body>

@@ -12,17 +12,121 @@
     }
   </script>
   <style>
-    .loader { border: 3px solid #374151; border-top: 3px solid #6366f1; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+    .loader {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent 0%, #6366f1 100%);
+      animation: spin 1s linear infinite;
+      position: relative;
+    }
+    .loader::before {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      background: #030712;
+    }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
+
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.7; }
+    }
+    .running-indicator { animation: pulse-dot 0.6s ease-in-out infinite; }
+
+    .resizer {
+      background: transparent;
+      position: relative;
+      cursor: col-resize;
+      transition: background 0.2s;
+    }
+    .resizer:hover, .resizer.dragging {
+      background: linear-gradient(to bottom, transparent, #6366f1, transparent);
+    }
+    .resizer::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 4px;
+      height: 40px;
+      background: #374151;
+      border-radius: 2px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .resizer:hover::after {
+      opacity: 1;
+    }
+
+    .output-line {
+      animation: fade-in 0.15s ease-out;
+    }
+
+    .kbd {
+      background: linear-gradient(180deg, #374151 0%, #1f2937 100%);
+      border: 1px solid #4b5563;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-family: inherit;
+      box-shadow: 0 2px 0 #111827;
+    }
+
+    .success-flash {
+      animation: flash-green 0.3s ease-out;
+    }
+    @keyframes flash-green {
+      0% { background-color: rgba(34, 197, 94, 0.3); }
+      100% { background-color: transparent; }
+    }
+
+    .tooltip {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+    .tooltip-trigger:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Custom scrollbar */
+    #output::-webkit-scrollbar {
+      width: 8px;
+    }
+    #output::-webkit-scrollbar-track {
+      background: #1f2937;
+    }
+    #output::-webkit-scrollbar-thumb {
+      background: #4b5563;
+      border-radius: 4px;
+    }
+    #output::-webkit-scrollbar-thumb:hover {
+      background: #6b7280;
+    }
+
+    .glass-panel {
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(12px);
+    }
   </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen">
+<body class="bg-gray-950 text-gray-100 min-h-screen overflow-hidden">
 
   <!-- Nav -->
   <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/90 backdrop-blur-lg border-b border-gray-800">
     <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-      <a href="/" class="flex items-center space-x-2">
-        <svg class="w-7 h-7 text-primary" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <a href="/" class="flex items-center space-x-2 group">
+        <svg class="w-7 h-7 text-primary transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
         <span class="text-lg font-bold">StrKit</span>
       </a>
       <div class="hidden md:flex items-center space-x-6 text-sm">
@@ -37,34 +141,78 @@
   <!-- Loading Screen -->
   <div id="loading" class="fixed inset-0 bg-gray-950 flex items-center justify-center z-40">
     <div class="text-center">
-      <div class="loader mx-auto mb-4"></div>
-      <p class="text-gray-400">Loading StrKit Playground...</p>
+      <div class="loader mx-auto mb-6"></div>
+      <p class="text-gray-400 text-sm">Loading StrKit Playground...</p>
+      <p class="text-gray-600 text-xs mt-2">Initializing Monaco Editor</p>
     </div>
   </div>
 
   <!-- Main Content -->
   <div id="app" class="pt-14 h-screen flex flex-col" style="display: none;">
     <!-- Toolbar -->
-    <div class="h-12 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-4">
-      <div class="flex items-center space-x-3">
-        <select id="examples" class="bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-primary">
-          <option value="case">Case Conversion</option>
-          <option value="validation">Validation</option>
-          <option value="chain">Chainable API</option>
-          <option value="manipulation">String Manipulation</option>
-          <option value="similarity">Similarity</option>
-          <option value="diff">Diff & Patch</option>
-          <option value="formatting">Formatting</option>
-          <option value="i18n">i18n / Locale</option>
-        </select>
+    <div class="h-12 bg-gray-900/80 border-b border-gray-800 flex items-center justify-between px-4 glass-panel">
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-2">
+          <label class="text-xs text-gray-500 uppercase tracking-wider">Examples</label>
+          <select id="examples" class="bg-gray-800/80 border border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition cursor-pointer">
+            <option value="case">Case Conversion</option>
+            <option value="validation">Validation</option>
+            <option value="chain">Chainable API</option>
+            <option value="manipulation">String Manipulation</option>
+            <option value="similarity">Similarity</option>
+            <option value="diff">Diff & Patch</option>
+            <option value="formatting">Formatting</option>
+            <option value="i18n">i18n / Locale</option>
+          </select>
+        </div>
+
+        <!-- Keyboard shortcuts hint -->
+        <div class="hidden lg:flex items-center space-x-2 text-xs text-gray-500">
+          <span class="kbd">Ctrl</span>
+          <span>+</span>
+          <span class="kbd">Enter</span>
+          <span class="text-gray-600">to run</span>
+        </div>
       </div>
+
       <div class="flex items-center space-x-2">
-        <button id="clearBtn" class="px-3 py-1.5 text-sm text-gray-400 hover:text-white transition">
+        <!-- Execution time -->
+        <div id="execTime" class="hidden text-xs text-gray-500 mr-2">
+          <span class="text-emerald-400">&#x2713;</span> <span id="execTimeValue">0</span>ms
+        </div>
+
+        <!-- Share button -->
+        <button id="shareBtn" class="tooltip-trigger relative px-3 py-1.5 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition flex items-center space-x-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+          </svg>
+          <span>Share</span>
+          <div class="tooltip absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 rounded text-xs whitespace-nowrap">
+            Copy shareable link
+          </div>
+        </button>
+
+        <!-- Format button -->
+        <button id="formatBtn" class="tooltip-trigger relative px-3 py-1.5 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition flex items-center space-x-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
+          </svg>
+          <span class="hidden sm:inline">Format</span>
+          <div class="tooltip absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 rounded text-xs whitespace-nowrap">
+            Format code (Alt+Shift+F)
+          </div>
+        </button>
+
+        <!-- Clear button -->
+        <button id="clearBtn" class="px-3 py-1.5 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition">
           Clear
         </button>
-        <button id="runBtn" class="px-4 py-1.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded transition flex items-center space-x-2">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
-          <span>Run</span>
+
+        <!-- Run button -->
+        <button id="runBtn" class="px-4 py-1.5 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white text-sm font-medium rounded-lg transition flex items-center space-x-2 shadow-lg shadow-primary/20">
+          <svg id="runIcon" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+          <div id="runSpinner" class="hidden running-indicator w-4 h-4 rounded-full bg-white"></div>
+          <span id="runText">Run</span>
         </button>
       </div>
     </div>
@@ -72,24 +220,58 @@
     <!-- Editor & Output -->
     <div class="flex-1 flex overflow-hidden">
       <!-- Editor Panel -->
-      <div class="w-1/2 flex flex-col border-r border-gray-800">
-        <div class="h-8 bg-gray-900/50 border-b border-gray-800 flex items-center px-3">
-          <span class="text-xs text-gray-500">editor.js</span>
-          <span class="ml-auto text-xs text-gray-600">Ctrl+Enter to run</span>
+      <div id="editorPanel" class="flex flex-col border-r border-gray-800" style="width: 50%;">
+        <div class="h-8 bg-gray-900/50 border-b border-gray-800 flex items-center px-4">
+          <div class="flex items-center space-x-2">
+            <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+          </div>
+          <span class="ml-4 text-xs text-gray-500">editor.js</span>
+          <span class="ml-auto text-xs text-gray-600 hidden sm:block">JavaScript</span>
         </div>
         <div id="editor" class="flex-1"></div>
       </div>
 
+      <!-- Resizer -->
+      <div id="resizer" class="w-1 border-x border-gray-800 resizer"></div>
+
       <!-- Output Panel -->
-      <div class="w-1/2 flex flex-col bg-gray-900/30">
-        <div class="h-8 bg-gray-900/50 border-b border-gray-800 flex items-center px-3">
-          <span class="text-xs text-gray-500">Console Output</span>
+      <div id="outputPanel" class="flex flex-col bg-gray-900/30" style="flex: 1;">
+        <div class="h-8 bg-gray-900/50 border-b border-gray-800 flex items-center justify-between px-4">
+          <div class="flex items-center space-x-2">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span class="text-xs text-gray-500">Console Output</span>
+          </div>
+          <button id="clearOutputBtn" class="text-xs text-gray-600 hover:text-gray-400 transition">
+            Clear
+          </button>
         </div>
         <div id="output" class="flex-1 p-4 overflow-auto font-mono text-sm space-y-1">
-          <div class="text-gray-500">// Press "Run" or Ctrl+Enter to execute...</div>
+          <div class="text-gray-500 output-line">// Press "Run" or Ctrl+Enter to execute...</div>
+          <div class="text-gray-600 output-line text-xs mt-2">// Available: strkit, str, S</div>
         </div>
       </div>
     </div>
+
+    <!-- Status Bar -->
+    <div class="h-6 bg-gray-900/50 border-t border-gray-800 flex items-center justify-between px-4 text-xs">
+      <div class="flex items-center space-x-4">
+        <span class="text-gray-500">StrKit Playground</span>
+        <span id="strkitVersion" class="text-gray-600"></span>
+      </div>
+      <div class="flex items-center space-x-4 text-gray-600">
+        <span id="cursorPos">Ln 1, Col 1</span>
+        <span>UTF-8</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+    <span id="toastText" class="text-sm"></span>
   </div>
 
   <!-- Monaco Editor -->
@@ -286,22 +468,50 @@ console.log('\\nSlugify TR:', str.sanitize.slugify('Turkce Baslik'));
 console.log('Slugify DE:', str.sanitize.slugify('Grosse Strasse'));`
     };
 
+    // Utility functions
+    function showToast(message, duration = 2000) {
+      const toast = document.getElementById('toast');
+      const toastText = document.getElementById('toastText');
+      toastText.textContent = message;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, duration);
+    }
+
+    // Load from URL hash if present
+    function loadFromHash() {
+      const hash = window.location.hash.slice(1);
+      if (hash) {
+        try {
+          const code = decodeURIComponent(atob(hash));
+          return code;
+        } catch (e) {
+          console.log('Invalid hash, using default');
+        }
+      }
+      return null;
+    }
+
     // Wait for Monaco to load
     require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
 
     // Load StrKit - try local first, then fallback to unpkg
     let strkitLoaded = false;
+    let strkitVersion = '';
     try {
-      // Try local dist first
       const module = await import('/dist/index.mjs');
       window.strkit = module;
       strkitLoaded = true;
+      strkitVersion = module.version || 'local';
     } catch (e1) {
       try {
-        // Fallback to unpkg
         const module = await import('https://unpkg.com/@oxog/strkit@latest/dist/index.mjs');
         window.strkit = module;
         strkitLoaded = true;
+        strkitVersion = module.version || 'latest';
       } catch (e2) {
         console.error('Failed to load StrKit:', e2);
       }
@@ -313,29 +523,38 @@ console.log('Slugify DE:', str.sanitize.slugify('Grosse Strasse'));`
         base: 'vs-dark',
         inherit: true,
         rules: [
-          { token: 'comment', foreground: '6b7280' },
+          { token: 'comment', foreground: '6b7280', fontStyle: 'italic' },
           { token: 'string', foreground: 'a5d6ff' },
           { token: 'keyword', foreground: 'c678dd' },
           { token: 'number', foreground: 'e5c07b' },
+          { token: 'function', foreground: '61afef' },
+          { token: 'variable', foreground: 'e06c75' },
         ],
         colors: {
-          'editor.background': '#0d1117',
+          'editor.background': '#0a0f1a',
           'editor.foreground': '#e6edf3',
-          'editor.lineHighlightBackground': '#161b22',
+          'editor.lineHighlightBackground': '#161b2266',
           'editorLineNumber.foreground': '#484f58',
-          'editorLineNumber.activeForeground': '#e6edf3',
-          'editor.selectionBackground': '#264f78',
+          'editorLineNumber.activeForeground': '#6366f1',
+          'editor.selectionBackground': '#264f7855',
           'editorCursor.foreground': '#6366f1',
+          'editor.inactiveSelectionBackground': '#264f7833',
+          'editorIndentGuide.background': '#21262d',
+          'editorIndentGuide.activeBackground': '#30363d',
         }
       });
 
+      // Get initial code
+      const hashCode = loadFromHash();
+      const initialCode = hashCode || examples.case;
+
       // Create editor
       const editor = monaco.editor.create(document.getElementById('editor'), {
-        value: examples.case,
+        value: initialCode,
         language: 'javascript',
         theme: 'strkit-dark',
         fontSize: 14,
-        fontFamily: "'Fira Code', 'Cascadia Code', Consolas, monospace",
+        fontFamily: "'Fira Code', 'Cascadia Code', 'JetBrains Mono', Consolas, monospace",
         fontLigatures: true,
         minimap: { enabled: false },
         scrollBeyondLastLine: false,
@@ -347,6 +566,9 @@ console.log('Slugify DE:', str.sanitize.slugify('Grosse Strasse'));`
         renderLineHighlight: 'all',
         cursorBlinking: 'smooth',
         smoothScrolling: true,
+        bracketPairColorization: { enabled: true },
+        guides: { bracketPairs: true },
+        suggest: { showKeywords: true },
       });
 
       // Add strkit type hints
@@ -356,12 +578,31 @@ console.log('Slugify DE:', str.sanitize.slugify('Grosse Strasse'));`
         declare const S: (input: string) => any;
       `);
 
+      // Update cursor position
+      const cursorPosEl = document.getElementById('cursorPos');
+      editor.onDidChangeCursorPosition((e) => {
+        cursorPosEl.textContent = `Ln ${e.position.lineNumber}, Col ${e.position.column}`;
+      });
+
+      // Update version
+      if (strkitVersion) {
+        document.getElementById('strkitVersion').textContent = `v${strkitVersion}`;
+      }
+
       const outputEl = document.getElementById('output');
       const examplesSelect = document.getElementById('examples');
       const runBtn = document.getElementById('runBtn');
       const clearBtn = document.getElementById('clearBtn');
+      const clearOutputBtn = document.getElementById('clearOutputBtn');
+      const shareBtn = document.getElementById('shareBtn');
+      const formatBtn = document.getElementById('formatBtn');
+      const execTimeEl = document.getElementById('execTime');
+      const execTimeValueEl = document.getElementById('execTimeValue');
+      const runIcon = document.getElementById('runIcon');
+      const runSpinner = document.getElementById('runSpinner');
+      const runText = document.getElementById('runText');
 
-      // Output functions - using safe DOM methods
+      // Output functions
       function clearOutput() {
         while (outputEl.firstChild) {
           outputEl.removeChild(outputEl.firstChild);
@@ -370,22 +611,56 @@ console.log('Slugify DE:', str.sanitize.slugify('Grosse Strasse'));`
 
       function appendOutput(text, type = 'log') {
         const line = document.createElement('div');
+        line.className = 'output-line';
+
+        const prefix = document.createElement('span');
+        prefix.className = 'text-gray-600 mr-2 select-none';
+
+        const content = document.createElement('span');
+        content.textContent = text;
+
         if (type === 'error') {
-          line.className = 'text-red-400';
+          prefix.textContent = '✕';
+          prefix.className = 'text-red-500 mr-2 select-none';
+          content.className = 'text-red-400';
         } else if (type === 'warn') {
-          line.className = 'text-yellow-400';
+          prefix.textContent = '⚠';
+          prefix.className = 'text-yellow-500 mr-2 select-none';
+          content.className = 'text-yellow-400';
         } else {
-          line.className = 'text-emerald-400';
+          prefix.textContent = '›';
+          content.className = 'text-emerald-400';
         }
-        line.textContent = text;
+
+        line.appendChild(prefix);
+        line.appendChild(content);
         outputEl.appendChild(line);
         outputEl.scrollTop = outputEl.scrollHeight;
       }
 
+      // Run button state
+      function setRunning(isRunning) {
+        if (isRunning) {
+          runIcon.classList.add('hidden');
+          runSpinner.classList.remove('hidden');
+          runText.textContent = 'Running...';
+          runBtn.disabled = true;
+        } else {
+          runIcon.classList.remove('hidden');
+          runSpinner.classList.add('hidden');
+          runText.textContent = 'Run';
+          runBtn.disabled = false;
+        }
+      }
+
       // Run code
       async function runCode() {
+        setRunning(true);
         clearOutput();
+        execTimeEl.classList.add('hidden');
+
         const code = editor.getValue();
+        const startTime = performance.now();
 
         // Override console
         const originalConsole = { ...console };
@@ -409,35 +684,118 @@ console.log('Slugify DE:', str.sanitize.slugify('Grosse Strasse'));`
           const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
           const fn = new AsyncFunction('strkit', code);
           await fn(window.strkit);
+
+          const endTime = performance.now();
+          const elapsed = Math.round(endTime - startTime);
+          execTimeValueEl.textContent = elapsed;
+          execTimeEl.classList.remove('hidden');
+
+          // Flash success
+          outputEl.classList.add('success-flash');
+          setTimeout(() => outputEl.classList.remove('success-flash'), 300);
         } catch (error) {
           appendOutput('Error: ' + error.message, 'error');
+          if (error.stack) {
+            const stackLines = error.stack.split('\n').slice(1, 3);
+            stackLines.forEach(line => appendOutput('  ' + line.trim(), 'error'));
+          }
         }
 
         // Restore console
         Object.assign(console, originalConsole);
+        setRunning(false);
       }
+
+      // Share functionality
+      function shareCode() {
+        const code = editor.getValue();
+        const encoded = btoa(encodeURIComponent(code));
+        const url = window.location.origin + window.location.pathname + '#' + encoded;
+        navigator.clipboard.writeText(url).then(() => {
+          showToast('Link copied to clipboard!');
+        }).catch(() => {
+          showToast('Failed to copy link');
+        });
+      }
+
+      // Format code
+      function formatCode() {
+        editor.getAction('editor.action.formatDocument').run();
+        showToast('Code formatted');
+      }
+
+      // Resizer functionality
+      const resizer = document.getElementById('resizer');
+      const editorPanel = document.getElementById('editorPanel');
+      const outputPanel = document.getElementById('outputPanel');
+      let isResizing = false;
+
+      resizer.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        resizer.classList.add('dragging');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+
+        const container = editorPanel.parentElement;
+        const containerRect = container.getBoundingClientRect();
+        const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+
+        if (newWidth >= 20 && newWidth <= 80) {
+          editorPanel.style.width = newWidth + '%';
+          outputPanel.style.flex = '1';
+        }
+      });
+
+      document.addEventListener('mouseup', () => {
+        if (isResizing) {
+          isResizing = false;
+          resizer.classList.remove('dragging');
+          document.body.style.cursor = '';
+          document.body.style.userSelect = '';
+        }
+      });
 
       // Event listeners
       runBtn.addEventListener('click', runCode);
+
       clearBtn.addEventListener('click', () => {
+        editor.setValue('');
+        editor.focus();
+      });
+
+      clearOutputBtn.addEventListener('click', () => {
         clearOutput();
         appendOutput('// Console cleared', 'log');
       });
+
+      shareBtn.addEventListener('click', shareCode);
+      formatBtn.addEventListener('click', formatCode);
 
       examplesSelect.addEventListener('change', (e) => {
         const example = examples[e.target.value];
         if (example) {
           editor.setValue(example);
           clearOutput();
+          appendOutput('// Loaded: ' + e.target.options[e.target.selectedIndex].text, 'log');
+          // Clear hash when switching examples
+          history.replaceState(null, '', window.location.pathname);
         }
       });
 
-      // Keyboard shortcut
+      // Keyboard shortcuts
       editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, runCode);
+      editor.addCommand(monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KeyF, formatCode);
 
       // Hide loading, show app
       document.getElementById('loading').style.display = 'none';
       document.getElementById('app').style.display = 'flex';
+
+      // Focus editor
+      editor.focus();
     });
   </script>
 </body>
