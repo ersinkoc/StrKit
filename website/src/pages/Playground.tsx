@@ -39,15 +39,16 @@ export default function Playground() {
   const containerRef = useRef<HTMLDivElement>(null)
   const isResizing = useRef(false)
 
-  // Load code from URL hash on mount
+  // Load code from URL query param on mount
   useEffect(() => {
-    const hash = window.location.hash.slice(1)
-    if (hash) {
+    const params = new URLSearchParams(window.location.search)
+    const codeParam = params.get('code')
+    if (codeParam) {
       try {
-        const decoded = decodeURIComponent(atob(hash))
+        const decoded = decodeURIComponent(atob(codeParam))
         setCode(decoded)
       } catch {
-        // Invalid hash, use default code
+        // Invalid code param, use default code
       }
     }
   }, [])
@@ -111,7 +112,7 @@ export default function Playground() {
 
   const shareCode = async () => {
     const encoded = btoa(encodeURIComponent(code))
-    const url = `${window.location.origin}${window.location.pathname}#${encoded}`
+    const url = `${window.location.origin}${window.location.pathname}?code=${encoded}${window.location.hash}`
     await navigator.clipboard.writeText(url)
     showToast('Link copied to clipboard!', 'success')
   }
@@ -120,7 +121,10 @@ export default function Playground() {
     setCode(defaultCode)
     setOutput([])
     setExecutionTime(null)
-    window.location.hash = ''
+    // Clear the code param from URL while preserving the hash route
+    const url = new URL(window.location.href)
+    url.searchParams.delete('code')
+    window.history.replaceState({}, '', url.toString())
   }
 
   // Handle resize
