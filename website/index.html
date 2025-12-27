@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StrKit - Zero-Dependency String Toolkit</title>
-  <meta name="description" content="The ultimate zero-dependency string manipulation toolkit for JavaScript/TypeScript. 115+ methods, 4 API styles, i18n support.">
+  <title>StrKit - The Ultimate String Manipulation Toolkit for JavaScript</title>
+  <meta name="description" content="Zero-dependency string manipulation toolkit with 115+ methods, 4 API styles, TypeScript support, and i18n. The Swiss Army knife for string operations.">
+  <meta name="keywords" content="javascript, typescript, string, manipulation, toolkit, library, npm, validation, formatting">
+  <link rel="canonical" href="https://strkit.oxog.dev">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="StrKit - String Manipulation Toolkit">
+  <meta property="og:description" content="Zero-dependency string toolkit with 115+ methods for JavaScript/TypeScript">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://strkit.oxog.dev">
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -14,321 +22,379 @@
       theme: {
         extend: {
           colors: {
-            primary: '#6366f1',
-            secondary: '#8b5cf6',
+            primary: { 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81' },
+            accent: { 400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed' },
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-out',
+            'slide-up': 'slideUp 0.5s ease-out',
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+            slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
           }
         }
       }
     }
   </script>
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-  <!-- Prism.js -->
-  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
-
   <style>
     [x-cloak] { display: none !important; }
-    .gradient-text {
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    pre[class*="language-"] {
-      margin: 0;
-      border-radius: 0.5rem;
-    }
-    code[class*="language-"] {
-      font-size: 0.875rem;
-    }
+    .gradient-text { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .gradient-border { background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899); }
+    .glass { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); }
+    .code-block { background: #0d1117; border: 1px solid #30363d; }
+    .glow { box-shadow: 0 0 40px rgba(99, 102, 241, 0.15); }
+    .glow-sm { box-shadow: 0 0 20px rgba(99, 102, 241, 0.1); }
+    .token-keyword { color: #ff7b72; }
+    .token-string { color: #a5d6ff; }
+    .token-function { color: #d2a8ff; }
+    .token-comment { color: #8b949e; }
+    .token-number { color: #ffa657; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #1f2937; }
+    ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
   </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen" x-data="{ mobileMenu: false, activeTab: 'npm' }">
+<body class="bg-gray-950 text-gray-100 font-sans antialiased" x-data="{ mobileMenu: false, copied: false }">
+
+  <!-- Gradient Background -->
+  <div class="fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/20 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/3 right-1/4 w-80 h-80 bg-accent-500/20 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-1/4 left-1/3 w-72 h-72 bg-pink-500/10 rounded-full blur-3xl"></div>
+  </div>
 
   <!-- Navigation -->
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-lg border-b border-gray-800">
+  <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-gray-800/50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
-        <div class="flex items-center">
-          <a href="/" class="flex items-center space-x-2">
-            <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-            </svg>
-            <span class="text-xl font-bold">StrKit</span>
+        <div class="flex items-center space-x-2">
+          <div class="w-9 h-9 rounded-lg gradient-border p-[2px]">
+            <div class="w-full h-full bg-gray-900 rounded-[6px] flex items-center justify-center">
+              <span class="text-lg font-bold gradient-text">S</span>
+            </div>
+          </div>
+          <span class="text-xl font-bold">StrKit</span>
+          <span class="hidden sm:inline-block px-2 py-0.5 text-xs font-medium bg-primary-500/20 text-primary-300 rounded-full">v1.0</span>
+        </div>
+
+        <div class="hidden md:flex items-center space-x-1">
+          <a href="/docs/" class="px-4 py-2 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition">Docs</a>
+          <a href="/docs/api/" class="px-4 py-2 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition">API</a>
+          <a href="/docs/examples/" class="px-4 py-2 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition">Examples</a>
+          <a href="/docs/playground/" class="px-4 py-2 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition">Playground</a>
+          <div class="w-px h-6 bg-gray-700 mx-2"></div>
+          <a href="https://github.com/ersinkoc/strkit" target="_blank" class="p-2 text-gray-400 hover:text-white transition">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+          <a href="https://www.npmjs.com/package/@oxog/strkit" target="_blank" class="p-2 text-gray-400 hover:text-white transition">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M0 7.334v8h6.666v1.332H12v-1.332h12v-8H0zm6.666 6.664H5.334v-4H3.999v4H1.335V8.667h5.331v5.331zm4 0v1.336H8.001V8.667h5.334v5.332h-2.669v-.001zm12.001 0h-1.33v-4h-1.336v4h-1.335v-4h-1.33v4h-2.671V8.667h8.002v5.331z"/></svg>
           </a>
         </div>
 
-        <div class="hidden md:flex items-center space-x-8">
-          <a href="/docs/" class="text-gray-300 hover:text-white transition">Docs</a>
-          <a href="/docs/api/" class="text-gray-300 hover:text-white transition">API</a>
-          <a href="/docs/examples/" class="text-gray-300 hover:text-white transition">Examples</a>
-          <a href="/docs/playground/" class="text-gray-300 hover:text-white transition">Playground</a>
-          <a href="https://github.com/ersinkoc/strkit" class="text-gray-300 hover:text-white transition" target="_blank">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          </a>
-        </div>
-
-        <div class="md:hidden flex items-center">
-          <button @click="mobileMenu = !mobileMenu" class="text-gray-300">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path x-show="!mobileMenu" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-              <path x-show="mobileMenu" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
+        <button @click="mobileMenu = !mobileMenu" class="md:hidden p-2 text-gray-400">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path x-show="!mobileMenu" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            <path x-show="mobileMenu" x-cloak stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
       </div>
     </div>
 
-    <!-- Mobile menu -->
-    <div x-show="mobileMenu" x-cloak class="md:hidden bg-gray-900 border-b border-gray-800">
-      <div class="px-4 py-3 space-y-2">
-        <a href="/docs/" class="block py-2 text-gray-300 hover:text-white">Docs</a>
-        <a href="/docs/api/" class="block py-2 text-gray-300 hover:text-white">API</a>
-        <a href="/docs/examples/" class="block py-2 text-gray-300 hover:text-white">Examples</a>
-        <a href="/docs/playground/" class="block py-2 text-gray-300 hover:text-white">Playground</a>
+    <!-- Mobile Menu -->
+    <div x-show="mobileMenu" x-cloak x-transition class="md:hidden glass border-t border-gray-800/50">
+      <div class="px-4 py-4 space-y-2">
+        <a href="/docs/" class="block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg">Documentation</a>
+        <a href="/docs/api/" class="block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg">API Reference</a>
+        <a href="/docs/examples/" class="block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg">Examples</a>
+        <a href="/docs/playground/" class="block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg">Playground</a>
       </div>
     </div>
   </nav>
 
   <!-- Hero Section -->
   <section class="pt-32 pb-20 px-4">
-    <div class="max-w-5xl mx-auto text-center">
-      <!-- Badges -->
-      <div class="flex flex-wrap justify-center gap-3 mb-8">
-        <span class="px-3 py-1 bg-green-500/10 text-green-400 text-sm rounded-full border border-green-500/20">Zero Dependencies</span>
-        <span class="px-3 py-1 bg-blue-500/10 text-blue-400 text-sm rounded-full border border-blue-500/20">115+ Methods</span>
-        <span class="px-3 py-1 bg-purple-500/10 text-purple-400 text-sm rounded-full border border-purple-500/20">&lt;15KB gzipped</span>
-        <span class="px-3 py-1 bg-yellow-500/10 text-yellow-400 text-sm rounded-full border border-yellow-500/20">TypeScript First</span>
-      </div>
-
-      <h1 class="text-5xl md:text-7xl font-bold mb-6">
-        The Ultimate<br>
-        <span class="gradient-text">String Toolkit</span>
-      </h1>
-
-      <p class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-        Zero-dependency string manipulation library for JavaScript/TypeScript.
-        115+ methods across 10 categories with 4 flexible API styles and i18n support.
-      </p>
-
-      <!-- Install Tabs -->
-      <div class="max-w-md mx-auto mb-10">
-        <div class="flex border-b border-gray-700 mb-4">
-          <button @click="activeTab = 'npm'" :class="activeTab === 'npm' ? 'border-primary text-white' : 'border-transparent text-gray-400'" class="px-4 py-2 border-b-2 transition">npm</button>
-          <button @click="activeTab = 'yarn'" :class="activeTab === 'yarn' ? 'border-primary text-white' : 'border-transparent text-gray-400'" class="px-4 py-2 border-b-2 transition">yarn</button>
-          <button @click="activeTab = 'pnpm'" :class="activeTab === 'pnpm' ? 'border-primary text-white' : 'border-transparent text-gray-400'" class="px-4 py-2 border-b-2 transition">pnpm</button>
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16 animate-fade-in">
+        <div class="inline-flex items-center space-x-2 px-4 py-2 bg-primary-500/10 border border-primary-500/20 rounded-full mb-8">
+          <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+          <span class="text-sm text-primary-300">v1.0 Released - Zero Dependencies</span>
         </div>
-        <div class="bg-gray-900 rounded-lg p-4 font-mono text-left">
+
+        <h1 class="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6">
+          String manipulation<br>
+          <span class="gradient-text">made simple.</span>
+        </h1>
+
+        <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
+          The Swiss Army knife for string operations. 115+ methods, 4 API styles,
+          TypeScript-first, with full i18n support. Zero dependencies.
+        </p>
+
+        <div class="inline-flex items-center space-x-3 px-5 py-3 code-block rounded-xl mb-10">
           <span class="text-gray-500">$</span>
-          <span x-show="activeTab === 'npm'" class="text-green-400"> npm install @oxog/strkit</span>
-          <span x-show="activeTab === 'yarn'" x-cloak class="text-green-400"> yarn add @oxog/strkit</span>
-          <span x-show="activeTab === 'pnpm'" x-cloak class="text-green-400"> pnpm add @oxog/strkit</span>
+          <code class="text-gray-100 font-mono">npm install @oxog/strkit</code>
+          <button @click="navigator.clipboard.writeText('npm install @oxog/strkit'); copied = true; setTimeout(() => copied = false, 2000)" class="p-1.5 hover:bg-white/10 rounded transition">
+            <svg x-show="!copied" class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <svg x-show="copied" x-cloak class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </button>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="/docs/" class="w-full sm:w-auto px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition transform hover:scale-105 shadow-lg shadow-primary-500/25">
+            Get Started
+            <svg class="inline w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+          </a>
+          <a href="/docs/playground/" class="w-full sm:w-auto px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-xl border border-gray-700 transition">
+            <svg class="inline w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+            Try Playground
+          </a>
         </div>
       </div>
 
-      <!-- CTA Buttons -->
-      <div class="flex flex-wrap justify-center gap-4">
-        <a href="/docs/" class="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition">
-          Get Started
+      <!-- Code Example -->
+      <div class="max-w-4xl mx-auto animate-slide-up">
+        <div class="code-block rounded-2xl overflow-hidden glow">
+          <div class="flex items-center px-4 py-3 border-b border-gray-800">
+            <div class="flex space-x-2">
+              <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+              <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+              <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+            </div>
+            <span class="ml-4 text-sm text-gray-500 font-mono">example.ts</span>
+          </div>
+          <pre class="p-6 overflow-x-auto font-mono text-sm leading-relaxed"><code><span class="token-keyword">import</span> { str, S } <span class="token-keyword">from</span> <span class="token-string">'@oxog/strkit'</span>;
+
+<span class="token-comment">// Namespace API - organized by category</span>
+str.case.<span class="token-function">camel</span>(<span class="token-string">'hello world'</span>);        <span class="token-comment">// 'helloWorld'</span>
+str.validate.<span class="token-function">email</span>(<span class="token-string">'a@b.com'</span>);       <span class="token-comment">// true</span>
+str.similarity.<span class="token-function">dice</span>(<span class="token-string">'night'</span>, <span class="token-string">'nacht'</span>); <span class="token-comment">// 0.25</span>
+
+<span class="token-comment">// Chainable API - fluent & immutable</span>
+<span class="token-function">S</span>(<span class="token-string">'  Hello World  '</span>)
+  .<span class="token-function">trim</span>()
+  .<span class="token-function">camelCase</span>()
+  .<span class="token-function">truncate</span>(<span class="token-number">8</span>)
+  .value;  <span class="token-comment">// 'helloW...'</span>
+
+<span class="token-comment">// i18n support - Turkish locale</span>
+str.case.<span class="token-function">upper</span>(<span class="token-string">'istanbul'</span>, { locale: <span class="token-string">'tr'</span> }); <span class="token-comment">// 'ISTANBUL'</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="py-16 px-4 border-y border-gray-800/50">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div class="text-center">
+          <div class="text-4xl font-bold gradient-text mb-2">115+</div>
+          <div class="text-gray-400">Methods</div>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl font-bold gradient-text mb-2">10</div>
+          <div class="text-gray-400">Categories</div>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl font-bold gradient-text mb-2">0</div>
+          <div class="text-gray-400">Dependencies</div>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl font-bold gradient-text mb-2">15</div>
+          <div class="text-gray-400">Locales</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-24 px-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">Everything you need</h2>
+        <p class="text-gray-400 text-lg max-w-2xl mx-auto">Comprehensive string toolkit with all the methods you'll ever need.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <a href="/docs/api/case.html" class="group p-6 bg-gray-900/50 hover:bg-gray-900 border border-gray-800 hover:border-primary-500/50 rounded-2xl transition-all duration-300 glow-sm hover:glow">
+          <div class="w-12 h-12 bg-primary-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary-500/20 transition">
+            <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+          </div>
+          <h3 class="text-lg font-semibold mb-2 group-hover:text-primary-400 transition">Case Conversion</h3>
+          <p class="text-gray-400 text-sm">camelCase, kebab-case, snake_case, PascalCase, Title Case and more.</p>
         </a>
-        <a href="/docs/playground/" class="px-8 py-3 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-lg transition">
-          Try Playground
+
+        <a href="/docs/api/validation.html" class="group p-6 bg-gray-900/50 hover:bg-gray-900 border border-gray-800 hover:border-green-500/50 rounded-2xl transition-all duration-300 glow-sm hover:glow">
+          <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-500/20 transition">
+            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="text-lg font-semibold mb-2 group-hover:text-green-400 transition">Validation</h3>
+          <p class="text-gray-400 text-sm">Email, URL, UUID, IP, credit card, and 15+ more validators.</p>
+        </a>
+
+        <a href="/docs/api/manipulation.html" class="group p-6 bg-gray-900/50 hover:bg-gray-900 border border-gray-800 hover:border-blue-500/50 rounded-2xl transition-all duration-300 glow-sm hover:glow">
+          <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-500/20 transition">
+            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
+          </div>
+          <h3 class="text-lg font-semibold mb-2 group-hover:text-blue-400 transition">Manipulation</h3>
+          <p class="text-gray-400 text-sm">Trim, pad, wrap, truncate, reverse, replace, and more.</p>
+        </a>
+
+        <a href="/docs/api/similarity.html" class="group p-6 bg-gray-900/50 hover:bg-gray-900 border border-gray-800 hover:border-yellow-500/50 rounded-2xl transition-all duration-300 glow-sm hover:glow">
+          <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-yellow-500/20 transition">
+            <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <h3 class="text-lg font-semibold mb-2 group-hover:text-yellow-400 transition">Similarity</h3>
+          <p class="text-gray-400 text-sm">Levenshtein, Dice, Jaro-Winkler, Hamming, and fuzzy matching.</p>
+        </a>
+
+        <a href="/docs/api/diff.html" class="group p-6 bg-gray-900/50 hover:bg-gray-900 border border-gray-800 hover:border-red-500/50 rounded-2xl transition-all duration-300 glow-sm hover:glow">
+          <div class="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-red-500/20 transition">
+            <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+          </div>
+          <h3 class="text-lg font-semibold mb-2 group-hover:text-red-400 transition">Diff & Patch</h3>
+          <p class="text-gray-400 text-sm">Character, word, and line diffs with unified patch support.</p>
+        </a>
+
+        <a href="/docs/api/formatting.html" class="group p-6 bg-gray-900/50 hover:bg-gray-900 border border-gray-800 hover:border-purple-500/50 rounded-2xl transition-all duration-300 glow-sm hover:glow">
+          <div class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-500/20 transition">
+            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+          </div>
+          <h3 class="text-lg font-semibold mb-2 group-hover:text-purple-400 transition">Formatting</h3>
+          <p class="text-gray-400 text-sm">Template, sprintf, mask, currency, and number formatting.</p>
+        </a>
+      </div>
+
+      <div class="text-center mt-10">
+        <a href="/docs/api/" class="inline-flex items-center text-primary-400 hover:text-primary-300 font-medium">
+          View all 10 categories
+          <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </a>
       </div>
     </div>
   </section>
 
   <!-- API Styles Section -->
-  <section class="py-20 px-4 bg-gray-900/50">
+  <section class="py-24 px-4 bg-gray-900/30">
     <div class="max-w-6xl mx-auto">
-      <h2 class="text-3xl font-bold text-center mb-4">4 Flexible API Styles</h2>
-      <p class="text-gray-400 text-center mb-12">Choose the style that fits your workflow</p>
+      <div class="text-center mb-16">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">4 API Styles</h2>
+        <p class="text-gray-400 text-lg max-w-2xl mx-auto">Choose the style that fits your codebase. All styles work with the same methods.</p>
+      </div>
 
       <div class="grid md:grid-cols-2 gap-6">
-        <!-- Style 1: Namespace -->
-        <div class="bg-gray-900 rounded-xl p-6 border border-gray-800">
-          <h3 class="text-lg font-semibold mb-2">1. Namespace API</h3>
-          <p class="text-gray-400 text-sm mb-4">Organized by category</p>
-          <pre><code class="language-typescript">import { str } from '@oxog/strkit';
+        <div class="code-block rounded-2xl overflow-hidden">
+          <div class="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+            <span class="text-sm font-medium text-primary-400">Namespace API</span>
+            <span class="text-xs text-gray-500">str.category.method()</span>
+          </div>
+          <pre class="p-5 font-mono text-sm"><code><span class="token-keyword">import</span> { str } <span class="token-keyword">from</span> <span class="token-string">'@oxog/strkit'</span>;
 
-str.case.camel('hello world');     // 'helloWorld'
-str.validate.email('a@b.com');     // true
-str.similarity.levenshtein('a','b'); // 1</code></pre>
+str.case.<span class="token-function">camel</span>(<span class="token-string">'hello world'</span>);
+str.validate.<span class="token-function">email</span>(<span class="token-string">'a@b.com'</span>);
+str.manipulation.<span class="token-function">truncate</span>(text, <span class="token-number">100</span>);</code></pre>
         </div>
 
-        <!-- Style 2: Direct Import -->
-        <div class="bg-gray-900 rounded-xl p-6 border border-gray-800">
-          <h3 class="text-lg font-semibold mb-2">2. Direct Import</h3>
-          <p class="text-gray-400 text-sm mb-4">Tree-shakeable</p>
-          <pre><code class="language-typescript">import { camelCase, isEmail } from '@oxog/strkit';
+        <div class="code-block rounded-2xl overflow-hidden">
+          <div class="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+            <span class="text-sm font-medium text-green-400">Chainable API</span>
+            <span class="text-xs text-gray-500">S(input).method().value</span>
+          </div>
+          <pre class="p-5 font-mono text-sm"><code><span class="token-keyword">import</span> { S } <span class="token-keyword">from</span> <span class="token-string">'@oxog/strkit'</span>;
 
-camelCase('hello world');  // 'helloWorld'
-isEmail('test@test.com');  // true</code></pre>
+<span class="token-function">S</span>(<span class="token-string">'  hello world  '</span>)
+  .<span class="token-function">trim</span>()
+  .<span class="token-function">camelCase</span>()
+  .<span class="token-function">truncate</span>(<span class="token-number">10</span>).value;</code></pre>
         </div>
 
-        <!-- Style 3: Chainable -->
-        <div class="bg-gray-900 rounded-xl p-6 border border-gray-800">
-          <h3 class="text-lg font-semibold mb-2">3. Chainable API</h3>
-          <p class="text-gray-400 text-sm mb-4">Fluent & immutable</p>
-          <pre><code class="language-typescript">import { S } from '@oxog/strkit';
+        <div class="code-block rounded-2xl overflow-hidden">
+          <div class="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+            <span class="text-sm font-medium text-yellow-400">Direct Import</span>
+            <span class="text-xs text-gray-500">import { method }</span>
+          </div>
+          <pre class="p-5 font-mono text-sm"><code><span class="token-keyword">import</span> { camelCase, isEmail } <span class="token-keyword">from</span> <span class="token-string">'@oxog/strkit'</span>;
 
-S('  Hello World  ')
-  .trim()
-  .camelCase()
-  .truncate(8)
-  .value;  // 'helloW...'</code></pre>
+<span class="token-function">camelCase</span>(<span class="token-string">'hello world'</span>);
+<span class="token-function">isEmail</span>(<span class="token-string">'user@example.com'</span>);</code></pre>
         </div>
 
-        <!-- Style 4: Prototype -->
-        <div class="bg-gray-900 rounded-xl p-6 border border-gray-800">
-          <h3 class="text-lg font-semibold mb-2">4. Prototype Extension</h3>
-          <p class="text-gray-400 text-sm mb-4">Native string methods</p>
-          <pre><code class="language-typescript">import '@oxog/strkit/extend';
+        <div class="code-block rounded-2xl overflow-hidden">
+          <div class="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+            <span class="text-sm font-medium text-purple-400">Plugin System</span>
+            <span class="text-xs text-gray-500">Extensible architecture</span>
+          </div>
+          <pre class="p-5 font-mono text-sm"><code><span class="token-keyword">import</span> { registerPlugin } <span class="token-keyword">from</span> <span class="token-string">'@oxog/strkit'</span>;
 
-'hello world'.camelCase();   // 'helloWorld'
-'test@test.com'.isEmail();   // true</code></pre>
+<span class="token-function">registerPlugin</span>({
+  name: <span class="token-string">'my-plugin'</span>,
+  methods: { <span class="token-function">custom</span>: () => ... }
+});</code></pre>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Categories Section -->
-  <section class="py-20 px-4">
-    <div class="max-w-6xl mx-auto">
-      <h2 class="text-3xl font-bold text-center mb-4">10 Categories, 115+ Methods</h2>
-      <p class="text-gray-400 text-center mb-12">Everything you need for string manipulation</p>
-
-      <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <a href="/docs/api/case.html" class="bg-gray-900 rounded-xl p-5 border border-gray-800 hover:border-primary/50 transition group">
-          <div class="text-3xl mb-3">Aa</div>
-          <h3 class="font-semibold group-hover:text-primary transition">Case</h3>
-          <p class="text-gray-500 text-sm">camel, kebab, snake, pascal...</p>
-        </a>
-
-        <a href="/docs/api/manipulation.html" class="bg-gray-900 rounded-xl p-5 border border-gray-800 hover:border-primary/50 transition group">
-          <div class="text-3xl mb-3">&#9998;</div>
-          <h3 class="font-semibold group-hover:text-primary transition">Manipulation</h3>
-          <p class="text-gray-500 text-sm">trim, truncate, wrap, pad...</p>
-        </a>
-
-        <a href="/docs/api/validation.html" class="bg-gray-900 rounded-xl p-5 border border-gray-800 hover:border-primary/50 transition group">
-          <div class="text-3xl mb-3">&#10003;</div>
-          <h3 class="font-semibold group-hover:text-primary transition">Validation</h3>
-          <p class="text-gray-500 text-sm">email, url, uuid, ip...</p>
-        </a>
-
-        <a href="/docs/api/sanitization.html" class="bg-gray-900 rounded-xl p-5 border border-gray-800 hover:border-primary/50 transition group">
-          <div class="text-3xl mb-3">&#128737;</div>
-          <h3 class="font-semibold group-hover:text-primary transition">Sanitization</h3>
-          <p class="text-gray-500 text-sm">slugify, escape, stripHtml...</p>
-        </a>
-
-        <a href="/docs/api/formatting.html" class="bg-gray-900 rounded-xl p-5 border border-gray-800 hover:border-primary/50 transition group">
-          <div class="text-3xl mb-3">{ }</div>
-          <h3 class="font-semibold group-hover:text-primary transition">Formatting</h3>
-          <p class="text-gray-500 text-sm">template, sprintf, mask...</p>
-        </a>
-
-        <a href="/docs/api/similarity.html" class="bg-gray-900 rounded-xl p-5 border border-gray-800 hover:border-primary/50 transition group">
-          <div class="text-3xl mb-3">&#8776;</div>
-          <h3 class="font-semibold group-hover:text-primary transition">Similarity</h3>
-          <p class="text-gray-500 text-sm">levenshtein, dice, jaro...</p>
-        </a>
-
-        <a href="/docs/api/analysis.html" class="bg-gray-900 rounded-xl p-5 border border-gray-800 hover:border-primary/50 transition group">
-          <div class="text-3xl mb-3">&#128202;</div>
-          <h3 class="font-semibold group-hover:text-primary transition">Analysis</h3>
-          <p class="text-gray-500 text-sm">wordCount, entropy...</p>
-        </a>
-
-        <a href="/docs/api/pluralization.html" class="bg-gray-900 rounded-xl p-5 border border-gray-800 hover:border-primary/50 transition group">
-          <div class="text-3xl mb-3">1&#8594;N</div>
-          <h3 class="font-semibold group-hover:text-primary transition">Pluralization</h3>
-          <p class="text-gray-500 text-sm">plural, singular...</p>
-        </a>
-
-        <a href="/docs/api/diff.html" class="bg-gray-900 rounded-xl p-5 border border-gray-800 hover:border-primary/50 transition group">
-          <div class="text-3xl mb-3">&#177;</div>
-          <h3 class="font-semibold group-hover:text-primary transition">Diff</h3>
-          <p class="text-gray-500 text-sm">diffChars, diffWords...</p>
-        </a>
-
-        <a href="/docs/api/search.html" class="bg-gray-900 rounded-xl p-5 border border-gray-800 hover:border-primary/50 transition group">
-          <div class="text-3xl mb-3">&#128269;</div>
-          <h3 class="font-semibold group-hover:text-primary transition">Search</h3>
-          <p class="text-gray-500 text-sm">contains, indexOf...</p>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- i18n Section -->
-  <section class="py-20 px-4 bg-gray-900/50">
+  <!-- CTA Section -->
+  <section class="py-24 px-4">
     <div class="max-w-4xl mx-auto text-center">
-      <h2 class="text-3xl font-bold mb-4">14 Locales Supported</h2>
-      <p class="text-gray-400 mb-8">Proper case conversion and transliteration for multiple languages</p>
+      <h2 class="text-3xl sm:text-4xl font-bold mb-6">Ready to simplify your string operations?</h2>
+      <p class="text-gray-400 text-lg mb-10">Get started in seconds. No configuration needed.</p>
 
-      <div class="bg-gray-900 rounded-xl p-6 border border-gray-800 text-left mb-8">
-        <pre><code class="language-typescript">import { str, setLocale } from '@oxog/strkit';
-
-// Turkish locale - proper i/I handling
-str.case.upper('istanbul', { locale: 'tr' });  // 'İSTANBUL'
-str.case.lower('ISTANBUL', { locale: 'tr' });  // 'ıstanbul'
-
-// Transliteration
-str.sanitize.transliterate('Привет', 'ru');    // 'Privet'
-str.sanitize.transliterate('你好', 'zh');       // 'ni hao'</code></pre>
-      </div>
-
-      <div class="flex flex-wrap justify-center gap-2">
-        <span class="px-3 py-1 bg-gray-800 rounded text-sm">English</span>
-        <span class="px-3 py-1 bg-gray-800 rounded text-sm">Turkish</span>
-        <span class="px-3 py-1 bg-gray-800 rounded text-sm">German</span>
-        <span class="px-3 py-1 bg-gray-800 rounded text-sm">French</span>
-        <span class="px-3 py-1 bg-gray-800 rounded text-sm">Spanish</span>
-        <span class="px-3 py-1 bg-gray-800 rounded text-sm">Portuguese</span>
-        <span class="px-3 py-1 bg-gray-800 rounded text-sm">Italian</span>
-        <span class="px-3 py-1 bg-gray-800 rounded text-sm">Dutch</span>
-        <span class="px-3 py-1 bg-gray-800 rounded text-sm">Polish</span>
-        <span class="px-3 py-1 bg-gray-800 rounded text-sm">Russian</span>
-        <span class="px-3 py-1 bg-gray-800 rounded text-sm">Arabic</span>
-        <span class="px-3 py-1 bg-gray-800 rounded text-sm">Chinese</span>
-        <span class="px-3 py-1 bg-gray-800 rounded text-sm">Japanese</span>
-        <span class="px-3 py-1 bg-gray-800 rounded text-sm">Korean</span>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="/docs/" class="w-full sm:w-auto px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition shadow-lg shadow-primary-500/25">
+          Read the Docs
+        </a>
+        <a href="https://github.com/ersinkoc/strkit" target="_blank" class="w-full sm:w-auto px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-xl border border-gray-700 transition">
+          View on GitHub
+        </a>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="py-12 px-4 border-t border-gray-800">
+  <footer class="py-12 px-4 border-t border-gray-800/50">
     <div class="max-w-6xl mx-auto">
-      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex items-center space-x-2">
-          <svg class="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-          </svg>
-          <span class="font-bold">StrKit</span>
+          <div class="w-8 h-8 rounded-lg gradient-border p-[2px]">
+            <div class="w-full h-full bg-gray-900 rounded-md flex items-center justify-center">
+              <span class="font-bold gradient-text">S</span>
+            </div>
+          </div>
+          <span class="font-semibold">StrKit</span>
+          <span class="text-gray-500 text-sm">by OXOG</span>
         </div>
 
-        <div class="flex items-center space-x-6 text-gray-400">
+        <div class="flex items-center space-x-6 text-sm text-gray-400">
+          <a href="/docs/" class="hover:text-white transition">Docs</a>
+          <a href="/docs/api/" class="hover:text-white transition">API</a>
+          <a href="/docs/playground/" class="hover:text-white transition">Playground</a>
           <a href="https://github.com/ersinkoc/strkit" class="hover:text-white transition">GitHub</a>
-          <a href="https://www.npmjs.com/package/@oxog/strkit" class="hover:text-white transition">NPM</a>
-          <a href="/docs/" class="hover:text-white transition">Documentation</a>
+          <a href="https://www.npmjs.com/package/@oxog/strkit" class="hover:text-white transition">npm</a>
         </div>
+      </div>
 
-        <p class="text-gray-500 text-sm">
-          Released under the MIT License.
-        </p>
+      <div class="mt-8 pt-8 border-t border-gray-800/50 text-center text-sm text-gray-500">
+        Released under the MIT License. Open source and free forever.
       </div>
     </div>
   </footer>
 
-  <script>
-    Prism.highlightAll();
-  </script>
 </body>
 </html>

@@ -3,137 +3,639 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manipulation - StrKit API</title>
+  <title>Manipulation API - StrKit Documentation</title>
+  <meta name="description" content="20+ methods for string manipulation including trim, truncate, wrap, pad, and more.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#6366f1' } } } }</script>
-  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
-  <style>pre[class*="language-"]{margin:0;border-radius:0.5rem;font-size:0.875rem;}</style>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            primary: {
+              50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc',
+              400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca',
+              800: '#3730a3', 900: '#312e81', 950: '#1e1b4b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    [x-cloak] { display: none !important; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #1f2937; }
+    ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+    .glass { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    .gradient-text {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      color: #9ca3af;
+      font-size: 0.9rem;
+      transition: all 0.15s ease;
+    }
+    .sidebar-link:hover { color: #f3f4f6; background: rgba(99, 102, 241, 0.1); }
+    .sidebar-link.active { color: #818cf8; background: rgba(99, 102, 241, 0.15); font-weight: 500; }
+
+    .code-block {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+    .code-block pre {
+      margin: 0;
+      padding: 1.25rem;
+      overflow-x: auto;
+      font-size: 0.875rem;
+      line-height: 1.7;
+    }
+    .code-block code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+    }
+
+    .token-keyword { color: #ff7b72; }
+    .token-string { color: #a5d6ff; }
+    .token-function { color: #d2a8ff; }
+    .token-comment { color: #8b949e; font-style: italic; }
+    .token-number { color: #79c0ff; }
+    .token-property { color: #7ee787; }
+
+    .method-card {
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.6) 0%, rgba(31, 41, 55, 0.4) 100%);
+      border: 1px solid rgba(75, 85, 99, 0.3);
+      border-radius: 1rem;
+      transition: all 0.2s ease;
+    }
+    .method-card:hover {
+      border-color: rgba(34, 197, 94, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .method-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .toc-link {
+      display: block;
+      padding: 0.25rem 0;
+      color: #9ca3af;
+      font-size: 0.875rem;
+      border-left: 2px solid transparent;
+      padding-left: 0.75rem;
+      margin-left: -2px;
+      transition: all 0.15s ease;
+    }
+    .toc-link:hover {
+      color: #f3f4f6;
+      border-color: rgba(34, 197, 94, 0.5);
+    }
+  </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen">
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-lg border-b border-gray-800">
-    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-      <a href="/" class="flex items-center space-x-2">
-        <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        <span class="text-xl font-bold">StrKit</span>
-      </a>
+<body class="bg-gray-950 text-gray-100 font-sans min-h-screen" x-data="{ mobileMenu: false, mobileSidebar: false }">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-gray-800/50">
+    <div class="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center gap-8">
+          <a href="../../" class="flex items-center space-x-3 group">
+            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-purple-600 flex items-center justify-center shadow-lg shadow-primary-500/25">
+              <span class="text-white font-bold text-lg">S</span>
+            </div>
+            <span class="text-xl font-bold">StrKit</span>
+          </a>
+
+          <div class="hidden lg:flex items-center gap-1">
+            <a href="../" class="px-4 py-2 text-gray-300 hover:text-white rounded-lg hover:bg-gray-800/50 transition">Docs</a>
+            <a href="./" class="px-4 py-2 text-white font-medium rounded-lg bg-gray-800/50">API</a>
+            <a href="../examples/" class="px-4 py-2 text-gray-300 hover:text-white rounded-lg hover:bg-gray-800/50 transition">Examples</a>
+            <a href="../playground/" class="px-4 py-2 text-gray-300 hover:text-white rounded-lg hover:bg-gray-800/50 transition">Playground</a>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <a href="https://github.com/anthropics/strkit" target="_blank" class="p-2 text-gray-400 hover:text-white transition">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+          </a>
+
+          <button @click="mobileMenu = !mobileMenu" class="lg:hidden p-2 text-gray-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path x-show="!mobileMenu" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+              <path x-show="mobileMenu" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
   </nav>
 
-  <main class="pt-24 pb-16 px-4 max-w-4xl mx-auto">
-    <nav class="text-sm text-gray-500 mb-4">
-      <a href="/docs/api/" class="hover:text-white">API</a> / <span class="text-gray-300">Manipulation</span>
-    </nav>
+  <div class="flex pt-16">
+    <!-- Sidebar -->
+    <aside class="hidden lg:block w-72 fixed left-0 top-16 bottom-0 overflow-y-auto border-r border-gray-800/50 bg-gray-900/30">
+      <div class="p-6">
+        <nav class="space-y-8">
+          <div>
+            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">API Reference</h3>
+            <ul class="space-y-1">
+              <li><a href="./" class="sidebar-link">Overview</a></li>
+              <li><a href="./case.html" class="sidebar-link">
+                <span class="w-2 h-2 rounded-full bg-blue-400 mr-3"></span>Case
+              </a></li>
+              <li><a href="./manipulation.html" class="sidebar-link active">
+                <span class="w-2 h-2 rounded-full bg-green-400 mr-3"></span>Manipulation
+              </a></li>
+              <li><a href="./validation.html" class="sidebar-link">
+                <span class="w-2 h-2 rounded-full bg-purple-400 mr-3"></span>Validation
+              </a></li>
+              <li><a href="./sanitization.html" class="sidebar-link">
+                <span class="w-2 h-2 rounded-full bg-orange-400 mr-3"></span>Sanitization
+              </a></li>
+              <li><a href="./formatting.html" class="sidebar-link">
+                <span class="w-2 h-2 rounded-full bg-pink-400 mr-3"></span>Formatting
+              </a></li>
+              <li><a href="./similarity.html" class="sidebar-link">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 mr-3"></span>Similarity
+              </a></li>
+              <li><a href="./analysis.html" class="sidebar-link">
+                <span class="w-2 h-2 rounded-full bg-yellow-400 mr-3"></span>Analysis
+              </a></li>
+              <li><a href="./pluralization.html" class="sidebar-link">
+                <span class="w-2 h-2 rounded-full bg-red-400 mr-3"></span>Pluralization
+              </a></li>
+              <li><a href="./diff.html" class="sidebar-link">
+                <span class="w-2 h-2 rounded-full bg-indigo-400 mr-3"></span>Diff
+              </a></li>
+              <li><a href="./search.html" class="sidebar-link">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 mr-3"></span>Search
+              </a></li>
+            </ul>
+          </div>
 
-    <h1 class="text-4xl font-bold mb-4">Manipulation</h1>
-    <p class="text-xl text-gray-400 mb-8">20+ methods for string manipulation.</p>
+          <div>
+            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">On This Page</h3>
+            <ul class="space-y-1 border-l-2 border-gray-800 ml-3">
+              <li><a href="#trim" class="toc-link">trim / trimStart / trimEnd</a></li>
+              <li><a href="#truncate" class="toc-link">truncate</a></li>
+              <li><a href="#wrap" class="toc-link">wrap / unwrap</a></li>
+              <li><a href="#between" class="toc-link">between / before / after</a></li>
+              <li><a href="#pad" class="toc-link">pad / padStart / padEnd</a></li>
+              <li><a href="#repeat" class="toc-link">repeat / reverse</a></li>
+              <li><a href="#replace" class="toc-link">replace / replaceAll</a></li>
+              <li><a href="#all-methods" class="toc-link">All Methods</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </aside>
 
-    <div class="space-y-12">
-      <section class="border-b border-gray-800 pb-8">
-        <h2 class="text-2xl font-semibold mb-3">trim / trimStart / trimEnd</h2>
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre><code class="language-typescript">str.manipulation.trim('  hello  ');      // 'hello'
-str.manipulation.trimStart('  hello');   // 'hello'
-str.manipulation.trimEnd('hello  ');     // 'hello'
+    <!-- Mobile sidebar button -->
+    <button @click="mobileSidebar = !mobileSidebar"
+            class="lg:hidden fixed bottom-6 right-6 z-40 w-14 h-14 bg-green-600 hover:bg-green-500 text-white rounded-full shadow-lg shadow-green-600/30 flex items-center justify-center transition">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+      </svg>
+    </button>
 
-S('  hello  ').trim().value;             // 'hello'</code></pre>
+    <!-- Main Content -->
+    <main class="flex-1 lg:ml-72 min-h-screen">
+      <div class="max-w-4xl mx-auto px-6 py-12 lg:py-16">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-sm text-gray-500 mb-8">
+          <a href="../../" class="hover:text-white transition">Home</a>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+          <a href="./" class="hover:text-white transition">API</a>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+          <span class="text-gray-300">Manipulation</span>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-12">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-3xl lg:text-4xl font-bold">Manipulation</h1>
+              <p class="text-gray-400">str.manipulation namespace</p>
+            </div>
+          </div>
+          <p class="text-xl text-gray-400 leading-relaxed">
+            20+ methods for modifying, trimming, padding, wrapping, and transforming strings.
+          </p>
+        </header>
+
+        <!-- Quick Import -->
+        <div class="mb-12 p-4 bg-gray-900/50 border border-gray-800 rounded-xl">
+          <p class="text-sm text-gray-400 mb-3">Quick Import:</p>
+          <div class="code-block">
+            <pre><code><span class="token-keyword">import</span> { str } <span class="token-keyword">from</span> <span class="token-string">'@oxog/strkit'</span>;
+<span class="token-comment">// Use: str.manipulation.trim('  hello  ')</span>
+
+<span class="token-comment">// Or chainable API:</span>
+<span class="token-keyword">import</span> { S } <span class="token-keyword">from</span> <span class="token-string">'@oxog/strkit'</span>;
+<span class="token-function">S</span>(<span class="token-string">'  hello  '</span>).<span class="token-function">trim</span>().value;</code></pre>
+          </div>
         </div>
-      </section>
 
-      <section class="border-b border-gray-800 pb-8">
-        <h2 class="text-2xl font-semibold mb-3">truncate</h2>
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre><code class="language-typescript">str.manipulation.truncate('hello world', 8);     // 'hello...'
-str.manipulation.truncate('hello world', 8, {
-  ellipsis: '…',
-  position: 'middle'
-}); // 'hel…rld'
+        <!-- Methods -->
+        <div class="space-y-12">
+          <!-- trim -->
+          <section id="trim" class="method-card p-6 scroll-mt-24">
+            <div class="flex items-center gap-3 mb-4">
+              <h2 class="text-2xl font-bold">trim / trimStart / trimEnd</h2>
+              <span class="method-badge bg-green-500/20 text-green-400">str.manipulation</span>
+            </div>
+            <p class="text-gray-400 mb-6">Remove whitespace from string ends. Optionally specify custom characters to trim.</p>
 
-S('hello world').truncate(8).value;              // 'hello...'</code></pre>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="text-gray-400 text-sm font-medium">Example</span>
+              </div>
+              <pre><code><span class="token-comment">// Basic trim</span>
+str.manipulation.<span class="token-function">trim</span>(<span class="token-string">'  hello  '</span>);      <span class="token-comment">// 'hello'</span>
+str.manipulation.<span class="token-function">trimStart</span>(<span class="token-string">'  hello'</span>);   <span class="token-comment">// 'hello'</span>
+str.manipulation.<span class="token-function">trimEnd</span>(<span class="token-string">'hello  '</span>);     <span class="token-comment">// 'hello'</span>
+
+<span class="token-comment">// Trim custom characters</span>
+str.manipulation.<span class="token-function">trim</span>(<span class="token-string">'---hello---'</span>, <span class="token-string">'-'</span>); <span class="token-comment">// 'hello'</span>
+
+<span class="token-comment">// Chainable API</span>
+<span class="token-function">S</span>(<span class="token-string">'  hello  '</span>).<span class="token-function">trim</span>().value;             <span class="token-comment">// 'hello'</span></code></pre>
+            </div>
+          </section>
+
+          <!-- truncate -->
+          <section id="truncate" class="method-card p-6 scroll-mt-24">
+            <div class="flex items-center gap-3 mb-4">
+              <h2 class="text-2xl font-bold">truncate</h2>
+              <span class="method-badge bg-green-500/20 text-green-400">str.manipulation</span>
+            </div>
+            <p class="text-gray-400 mb-6">Shorten string to specified length with customizable ellipsis and position.</p>
+
+            <div class="code-block">
+              <div class="code-header">
+                <span class="text-gray-400 text-sm font-medium">Example</span>
+              </div>
+              <pre><code><span class="token-comment">// Basic truncation</span>
+str.manipulation.<span class="token-function">truncate</span>(<span class="token-string">'hello world'</span>, <span class="token-number">8</span>);     <span class="token-comment">// 'hello...'</span>
+
+<span class="token-comment">// Custom ellipsis</span>
+str.manipulation.<span class="token-function">truncate</span>(<span class="token-string">'hello world'</span>, <span class="token-number">8</span>, {
+  ellipsis: <span class="token-string">'...'</span>
+}); <span class="token-comment">// 'hello...'</span>
+
+<span class="token-comment">// Middle truncation</span>
+str.manipulation.<span class="token-function">truncate</span>(<span class="token-string">'hello world'</span>, <span class="token-number">8</span>, {
+  ellipsis: <span class="token-string">'...'</span>,
+  position: <span class="token-string">'middle'</span>
+}); <span class="token-comment">// 'hel...ld'</span>
+
+<span class="token-comment">// Chainable</span>
+<span class="token-function">S</span>(<span class="token-string">'hello world'</span>).<span class="token-function">truncate</span>(<span class="token-number">8</span>).value;              <span class="token-comment">// 'hello...'</span></code></pre>
+            </div>
+          </section>
+
+          <!-- wrap / unwrap -->
+          <section id="wrap" class="method-card p-6 scroll-mt-24">
+            <div class="flex items-center gap-3 mb-4">
+              <h2 class="text-2xl font-bold">wrap / unwrap</h2>
+              <span class="method-badge bg-green-500/20 text-green-400">str.manipulation</span>
+            </div>
+            <p class="text-gray-400 mb-6">Wrap a string with characters or remove wrapping characters.</p>
+
+            <div class="code-block">
+              <div class="code-header">
+                <span class="text-gray-400 text-sm font-medium">Example</span>
+              </div>
+              <pre><code><span class="token-comment">// Symmetric wrapping</span>
+str.manipulation.<span class="token-function">wrap</span>(<span class="token-string">'hello'</span>, <span class="token-string">'"'</span>);           <span class="token-comment">// '"hello"'</span>
+str.manipulation.<span class="token-function">wrap</span>(<span class="token-string">'hello'</span>, <span class="token-string">'**'</span>);          <span class="token-comment">// '**hello**'</span>
+
+<span class="token-comment">// Asymmetric wrapping</span>
+str.manipulation.<span class="token-function">wrap</span>(<span class="token-string">'hello'</span>, <span class="token-string">'['</span>, <span class="token-string">']'</span>);      <span class="token-comment">// '[hello]'</span>
+str.manipulation.<span class="token-function">wrap</span>(<span class="token-string">'hello'</span>, <span class="token-string">'&lt;b&gt;'</span>, <span class="token-string">'&lt;/b&gt;'</span>);  <span class="token-comment">// '&lt;b&gt;hello&lt;/b&gt;'</span>
+
+<span class="token-comment">// Unwrap</span>
+str.manipulation.<span class="token-function">unwrap</span>(<span class="token-string">'"hello"'</span>, <span class="token-string">'"'</span>);       <span class="token-comment">// 'hello'</span>
+str.manipulation.<span class="token-function">unwrap</span>(<span class="token-string">'[hello]'</span>, <span class="token-string">'['</span>, <span class="token-string">']'</span>); <span class="token-comment">// 'hello'</span>
+
+<span class="token-comment">// Chainable</span>
+<span class="token-function">S</span>(<span class="token-string">'hello'</span>).<span class="token-function">wrap</span>(<span class="token-string">'['</span>, <span class="token-string">']'</span>).value;               <span class="token-comment">// '[hello]'</span></code></pre>
+            </div>
+          </section>
+
+          <!-- between / before / after -->
+          <section id="between" class="method-card p-6 scroll-mt-24">
+            <div class="flex items-center gap-3 mb-4">
+              <h2 class="text-2xl font-bold">between / before / after</h2>
+              <span class="method-badge bg-green-500/20 text-green-400">str.manipulation</span>
+            </div>
+            <p class="text-gray-400 mb-6">Extract substrings relative to delimiters.</p>
+
+            <div class="code-block">
+              <div class="code-header">
+                <span class="text-gray-400 text-sm font-medium">Example</span>
+              </div>
+              <pre><code><span class="token-comment">// Extract between delimiters</span>
+str.manipulation.<span class="token-function">between</span>(<span class="token-string">'&lt;tag&gt;content&lt;/tag&gt;'</span>, <span class="token-string">'&lt;tag&gt;'</span>, <span class="token-string">'&lt;/tag&gt;'</span>); <span class="token-comment">// 'content'</span>
+str.manipulation.<span class="token-function">between</span>(<span class="token-string">'[value]'</span>, <span class="token-string">'['</span>, <span class="token-string">']'</span>);                    <span class="token-comment">// 'value'</span>
+
+<span class="token-comment">// Before delimiter</span>
+str.manipulation.<span class="token-function">before</span>(<span class="token-string">'hello@world.com'</span>, <span class="token-string">'@'</span>);    <span class="token-comment">// 'hello'</span>
+str.manipulation.<span class="token-function">beforeLast</span>(<span class="token-string">'a@b@c'</span>, <span class="token-string">'@'</span>);          <span class="token-comment">// 'a@b'</span>
+
+<span class="token-comment">// After delimiter</span>
+str.manipulation.<span class="token-function">after</span>(<span class="token-string">'hello@world.com'</span>, <span class="token-string">'@'</span>);     <span class="token-comment">// 'world.com'</span>
+str.manipulation.<span class="token-function">afterLast</span>(<span class="token-string">'a@b@c'</span>, <span class="token-string">'@'</span>);           <span class="token-comment">// 'c'</span>
+
+<span class="token-comment">// Chainable</span>
+<span class="token-function">S</span>(<span class="token-string">'hello@world'</span>).<span class="token-function">before</span>(<span class="token-string">'@'</span>).value;             <span class="token-comment">// 'hello'</span></code></pre>
+            </div>
+          </section>
+
+          <!-- pad -->
+          <section id="pad" class="method-card p-6 scroll-mt-24">
+            <div class="flex items-center gap-3 mb-4">
+              <h2 class="text-2xl font-bold">pad / padStart / padEnd</h2>
+              <span class="method-badge bg-green-500/20 text-green-400">str.manipulation</span>
+            </div>
+            <p class="text-gray-400 mb-6">Pad strings to reach a target length.</p>
+
+            <div class="code-block">
+              <div class="code-header">
+                <span class="text-gray-400 text-sm font-medium">Example</span>
+              </div>
+              <pre><code><span class="token-comment">// Pad start (left)</span>
+str.manipulation.<span class="token-function">padStart</span>(<span class="token-string">'5'</span>, <span class="token-number">3</span>, <span class="token-string">'0'</span>);    <span class="token-comment">// '005'</span>
+str.manipulation.<span class="token-function">padStart</span>(<span class="token-string">'42'</span>, <span class="token-number">5</span>, <span class="token-string">'0'</span>);   <span class="token-comment">// '00042'</span>
+
+<span class="token-comment">// Pad end (right)</span>
+str.manipulation.<span class="token-function">padEnd</span>(<span class="token-string">'hi'</span>, <span class="token-number">5</span>, <span class="token-string">'!'</span>);      <span class="token-comment">// 'hi!!!'</span>
+str.manipulation.<span class="token-function">padEnd</span>(<span class="token-string">'1.5'</span>, <span class="token-number">6</span>, <span class="token-string">'0'</span>);     <span class="token-comment">// '1.5000'</span>
+
+<span class="token-comment">// Pad both sides (center)</span>
+str.manipulation.<span class="token-function">pad</span>(<span class="token-string">'hi'</span>, <span class="token-number">6</span>, <span class="token-string">'*'</span>);         <span class="token-comment">// '**hi**'</span>
+
+<span class="token-comment">// Chainable</span>
+<span class="token-function">S</span>(<span class="token-string">'5'</span>).<span class="token-function">padStart</span>(<span class="token-number">3</span>, <span class="token-string">'0'</span>).value;           <span class="token-comment">// '005'</span></code></pre>
+            </div>
+          </section>
+
+          <!-- repeat / reverse -->
+          <section id="repeat" class="method-card p-6 scroll-mt-24">
+            <div class="flex items-center gap-3 mb-4">
+              <h2 class="text-2xl font-bold">repeat / reverse</h2>
+              <span class="method-badge bg-green-500/20 text-green-400">str.manipulation</span>
+            </div>
+            <p class="text-gray-400 mb-6">Repeat or reverse strings.</p>
+
+            <div class="code-block">
+              <div class="code-header">
+                <span class="text-gray-400 text-sm font-medium">Example</span>
+              </div>
+              <pre><code><span class="token-comment">// Repeat</span>
+str.manipulation.<span class="token-function">repeat</span>(<span class="token-string">'ab'</span>, <span class="token-number">3</span>);      <span class="token-comment">// 'ababab'</span>
+str.manipulation.<span class="token-function">repeat</span>(<span class="token-string">'-'</span>, <span class="token-number">10</span>);      <span class="token-comment">// '----------'</span>
+
+<span class="token-comment">// Reverse</span>
+str.manipulation.<span class="token-function">reverse</span>(<span class="token-string">'hello'</span>);     <span class="token-comment">// 'olleh'</span>
+str.manipulation.<span class="token-function">reverse</span>(<span class="token-string">'12345'</span>);     <span class="token-comment">// '54321'</span>
+
+<span class="token-comment">// Chainable</span>
+<span class="token-function">S</span>(<span class="token-string">'ab'</span>).<span class="token-function">repeat</span>(<span class="token-number">3</span>).value;              <span class="token-comment">// 'ababab'</span>
+<span class="token-function">S</span>(<span class="token-string">'hello'</span>).<span class="token-function">reverse</span>().value;          <span class="token-comment">// 'olleh'</span></code></pre>
+            </div>
+          </section>
+
+          <!-- replace -->
+          <section id="replace" class="method-card p-6 scroll-mt-24">
+            <div class="flex items-center gap-3 mb-4">
+              <h2 class="text-2xl font-bold">replace / replaceAll</h2>
+              <span class="method-badge bg-green-500/20 text-green-400">str.manipulation</span>
+            </div>
+            <p class="text-gray-400 mb-6">Replace occurrences of a substring.</p>
+
+            <div class="code-block">
+              <div class="code-header">
+                <span class="text-gray-400 text-sm font-medium">Example</span>
+              </div>
+              <pre><code><span class="token-comment">// Replace first occurrence</span>
+str.manipulation.<span class="token-function">replace</span>(<span class="token-string">'hello hello'</span>, <span class="token-string">'hello'</span>, <span class="token-string">'hi'</span>); <span class="token-comment">// 'hi hello'</span>
+
+<span class="token-comment">// Replace all occurrences</span>
+str.manipulation.<span class="token-function">replaceAll</span>(<span class="token-string">'hello hello'</span>, <span class="token-string">'hello'</span>, <span class="token-string">'hi'</span>); <span class="token-comment">// 'hi hi'</span>
+
+<span class="token-comment">// With regex</span>
+str.manipulation.<span class="token-function">replaceAll</span>(<span class="token-string">'a1b2c3'</span>, <span class="token-string">/[0-9]/g</span>, <span class="token-string">''</span>); <span class="token-comment">// 'abc'</span>
+
+<span class="token-comment">// Chainable</span>
+<span class="token-function">S</span>(<span class="token-string">'hello world'</span>).<span class="token-function">replace</span>(<span class="token-string">'world'</span>, <span class="token-string">'universe'</span>).value; <span class="token-comment">// 'hello universe'</span></code></pre>
+            </div>
+          </section>
+
+          <!-- All Methods Table -->
+          <section id="all-methods" class="scroll-mt-24">
+            <h2 class="text-2xl font-bold mb-6">All Methods</h2>
+            <div class="overflow-x-auto rounded-xl border border-gray-800">
+              <table class="w-full text-left">
+                <thead class="bg-gray-900/80">
+                  <tr>
+                    <th class="px-6 py-4 text-sm font-semibold text-gray-300">Method</th>
+                    <th class="px-6 py-4 text-sm font-semibold text-gray-300">Description</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-800">
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">trim</code></td>
+                    <td class="px-6 py-4 text-gray-400">Remove whitespace from both ends</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">trimStart</code></td>
+                    <td class="px-6 py-4 text-gray-400">Remove whitespace from start</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">trimEnd</code></td>
+                    <td class="px-6 py-4 text-gray-400">Remove whitespace from end</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">truncate</code></td>
+                    <td class="px-6 py-4 text-gray-400">Shorten string with ellipsis</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">wrap</code></td>
+                    <td class="px-6 py-4 text-gray-400">Wrap with characters</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">unwrap</code></td>
+                    <td class="px-6 py-4 text-gray-400">Remove wrapper characters</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">between</code></td>
+                    <td class="px-6 py-4 text-gray-400">Extract between delimiters</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">before</code></td>
+                    <td class="px-6 py-4 text-gray-400">Get string before first delimiter</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">after</code></td>
+                    <td class="px-6 py-4 text-gray-400">Get string after first delimiter</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">beforeLast</code></td>
+                    <td class="px-6 py-4 text-gray-400">Get string before last delimiter</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">afterLast</code></td>
+                    <td class="px-6 py-4 text-gray-400">Get string after last delimiter</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">pad</code></td>
+                    <td class="px-6 py-4 text-gray-400">Pad on both sides (center)</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">padStart</code></td>
+                    <td class="px-6 py-4 text-gray-400">Pad at start</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">padEnd</code></td>
+                    <td class="px-6 py-4 text-gray-400">Pad at end</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">repeat</code></td>
+                    <td class="px-6 py-4 text-gray-400">Repeat string n times</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">reverse</code></td>
+                    <td class="px-6 py-4 text-gray-400">Reverse string</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">insert</code></td>
+                    <td class="px-6 py-4 text-gray-400">Insert at position</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">remove</code></td>
+                    <td class="px-6 py-4 text-gray-400">Remove substring</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">replace</code></td>
+                    <td class="px-6 py-4 text-gray-400">Replace first occurrence</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">replaceAll</code></td>
+                    <td class="px-6 py-4 text-gray-400">Replace all occurrences</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">append</code></td>
+                    <td class="px-6 py-4 text-gray-400">Add to end</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">prepend</code></td>
+                    <td class="px-6 py-4 text-gray-400">Add to start</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">surround</code></td>
+                    <td class="px-6 py-4 text-gray-400">Wrap with same character</td>
+                  </tr>
+                  <tr class="hover:bg-gray-900/50 transition">
+                    <td class="px-6 py-4"><code class="text-green-400">collapseWhitespace</code></td>
+                    <td class="px-6 py-4 text-gray-400">Normalize whitespace</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
-      </section>
 
-      <section class="border-b border-gray-800 pb-8">
-        <h2 class="text-2xl font-semibold mb-3">wrap / unwrap</h2>
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre><code class="language-typescript">str.manipulation.wrap('hello', '"');           // '"hello"'
-str.manipulation.wrap('hello', '[', ']');      // '[hello]'
-str.manipulation.unwrap('"hello"', '"');       // 'hello'
+        <!-- Pagination -->
+        <nav class="flex items-center justify-between pt-12 border-t border-gray-800 mt-12">
+          <a href="./case.html" class="flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-white transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Case
+          </a>
+          <a href="./validation.html" class="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition">
+            Validation
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </nav>
+      </div>
 
-S('hello').wrap('[', ']').value;               // '[hello]'</code></pre>
+      <!-- Footer -->
+      <footer class="border-t border-gray-800 mt-16">
+        <div class="max-w-4xl mx-auto px-6 py-8">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2 text-gray-400 text-sm">
+              <span>Built with</span>
+              <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+              <span>by</span>
+              <a href="https://github.com/ersinkoc" class="text-primary-400 hover:text-primary-300">@ersinkoc</a>
+            </div>
+            <div class="flex items-center gap-6 text-sm text-gray-500">
+              <a href="https://github.com/ersinkoc/strkit" class="hover:text-white transition">GitHub</a>
+              <a href="https://www.npmjs.com/package/@oxog/strkit" class="hover:text-white transition">npm</a>
+              <span>MIT License</span>
+            </div>
+          </div>
         </div>
-      </section>
-
-      <section class="border-b border-gray-800 pb-8">
-        <h2 class="text-2xl font-semibold mb-3">between / before / after</h2>
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre><code class="language-typescript">str.manipulation.between('&lt;tag&gt;', '&lt;', '&gt;');  // 'tag'
-str.manipulation.before('hello@world', '@');    // 'hello'
-str.manipulation.after('hello@world', '@');     // 'world'
-str.manipulation.beforeLast('a@b@c', '@');      // 'a@b'
-str.manipulation.afterLast('a@b@c', '@');       // 'c'
-
-S('hello@world').before('@').value;             // 'hello'</code></pre>
-        </div>
-      </section>
-
-      <section class="border-b border-gray-800 pb-8">
-        <h2 class="text-2xl font-semibold mb-3">pad / padStart / padEnd</h2>
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre><code class="language-typescript">str.manipulation.padStart('5', 3, '0');  // '005'
-str.manipulation.padEnd('5', 3, '0');    // '500'
-
-S('5').padStart(3, '0').value;           // '005'</code></pre>
-        </div>
-      </section>
-
-      <section class="border-b border-gray-800 pb-8">
-        <h2 class="text-2xl font-semibold mb-3">repeat / reverse</h2>
-        <div class="bg-gray-900 rounded-lg p-4">
-          <pre><code class="language-typescript">str.manipulation.repeat('ab', 3);   // 'ababab'
-str.manipulation.reverse('hello');  // 'olleh'
-
-S('ab').repeat(3).value;            // 'ababab'
-S('hello').reverse().value;         // 'olleh'</code></pre>
-        </div>
-      </section>
-
-      <section>
-        <h2 class="text-2xl font-semibold mb-4">All Methods</h2>
-        <div class="grid md:grid-cols-2 gap-2 text-sm">
-          <div class="bg-gray-900 p-3 rounded"><code>trim</code> - Remove whitespace</div>
-          <div class="bg-gray-900 p-3 rounded"><code>trimStart</code> - Remove leading whitespace</div>
-          <div class="bg-gray-900 p-3 rounded"><code>trimEnd</code> - Remove trailing whitespace</div>
-          <div class="bg-gray-900 p-3 rounded"><code>truncate</code> - Shorten with ellipsis</div>
-          <div class="bg-gray-900 p-3 rounded"><code>wrap</code> - Wrap with characters</div>
-          <div class="bg-gray-900 p-3 rounded"><code>unwrap</code> - Remove wrapper</div>
-          <div class="bg-gray-900 p-3 rounded"><code>between</code> - Extract between delimiters</div>
-          <div class="bg-gray-900 p-3 rounded"><code>before</code> - Get string before delimiter</div>
-          <div class="bg-gray-900 p-3 rounded"><code>after</code> - Get string after delimiter</div>
-          <div class="bg-gray-900 p-3 rounded"><code>beforeLast</code> - Before last occurrence</div>
-          <div class="bg-gray-900 p-3 rounded"><code>afterLast</code> - After last occurrence</div>
-          <div class="bg-gray-900 p-3 rounded"><code>padStart</code> - Pad at start</div>
-          <div class="bg-gray-900 p-3 rounded"><code>padEnd</code> - Pad at end</div>
-          <div class="bg-gray-900 p-3 rounded"><code>repeat</code> - Repeat string</div>
-          <div class="bg-gray-900 p-3 rounded"><code>reverse</code> - Reverse string</div>
-          <div class="bg-gray-900 p-3 rounded"><code>insert</code> - Insert at position</div>
-          <div class="bg-gray-900 p-3 rounded"><code>remove</code> - Remove substring</div>
-          <div class="bg-gray-900 p-3 rounded"><code>replace</code> - Replace first match</div>
-          <div class="bg-gray-900 p-3 rounded"><code>replaceAll</code> - Replace all matches</div>
-          <div class="bg-gray-900 p-3 rounded"><code>append</code> - Add to end</div>
-          <div class="bg-gray-900 p-3 rounded"><code>prepend</code> - Add to start</div>
-          <div class="bg-gray-900 p-3 rounded"><code>surround</code> - Wrap with same char</div>
-          <div class="bg-gray-900 p-3 rounded"><code>collapseWhitespace</code> - Normalize spaces</div>
-        </div>
-      </section>
-    </div>
-
-    <div class="mt-12 flex justify-between">
-      <a href="/docs/api/case.html" class="text-primary hover:underline">&larr; Case</a>
-      <a href="/docs/api/validation.html" class="text-primary hover:underline">Validation &rarr;</a>
-    </div>
-  </main>
-  <script>Prism.highlightAll();</script>
+      </footer>
+    </main>
+  </div>
 </body>
 </html>

@@ -3,82 +3,260 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Formatting - StrKit API</title>
+  <title>Formatting API - StrKit Documentation</title>
+  <meta name="description" content="8 methods for string formatting including template, sprintf, mask, currency, and ordinalize.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#6366f1' } } } }</script>
-  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
-  <style>pre[class*="language-"]{margin:0;border-radius:0.5rem;font-size:0.875rem;}</style>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+          colors: { primary: { 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81', 950: '#1e1b4b' } }
+        }
+      }
+    }
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #1f2937; }
+    ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+    .glass { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); }
+    .sidebar-link { display: flex; align-items: center; padding: 0.5rem 0.75rem; border-radius: 0.5rem; color: #9ca3af; font-size: 0.9rem; transition: all 0.15s ease; }
+    .sidebar-link:hover { color: #f3f4f6; background: rgba(99, 102, 241, 0.1); }
+    .sidebar-link.active { color: #818cf8; background: rgba(99, 102, 241, 0.15); font-weight: 500; }
+    .code-block { background: #0d1117; border: 1px solid #30363d; border-radius: 0.75rem; overflow: hidden; }
+    .code-block pre { margin: 0; padding: 1.25rem; overflow-x: auto; font-size: 0.875rem; line-height: 1.7; }
+    .code-block code { font-family: 'JetBrains Mono', monospace; }
+    .code-header { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: #161b22; border-bottom: 1px solid #30363d; }
+    .token-keyword { color: #ff7b72; }
+    .token-string { color: #a5d6ff; }
+    .token-function { color: #d2a8ff; }
+    .token-comment { color: #8b949e; font-style: italic; }
+    .token-number { color: #79c0ff; }
+    .method-card { background: linear-gradient(135deg, rgba(17, 24, 39, 0.6) 0%, rgba(31, 41, 55, 0.4) 100%); border: 1px solid rgba(75, 85, 99, 0.3); border-radius: 1rem; transition: all 0.2s ease; }
+    .method-card:hover { border-color: rgba(236, 72, 153, 0.3); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
+    .method-badge { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; font-family: 'JetBrains Mono', monospace; }
+    .toc-link { display: block; padding: 0.25rem 0; color: #9ca3af; font-size: 0.875rem; border-left: 2px solid transparent; padding-left: 0.75rem; margin-left: -2px; transition: all 0.15s ease; }
+    .toc-link:hover { color: #f3f4f6; border-color: rgba(236, 72, 153, 0.5); }
+  </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen">
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-lg border-b border-gray-800">
-    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-      <a href="/" class="flex items-center space-x-2">
-        <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        <span class="text-xl font-bold">StrKit</span>
-      </a>
+<body class="bg-gray-950 text-gray-100 font-sans min-h-screen" x-data="{ mobileMenu: false, mobileSidebar: false }">
+  <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-gray-800/50">
+    <div class="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center gap-8">
+          <a href="../../" class="flex items-center space-x-3 group">
+            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-purple-600 flex items-center justify-center shadow-lg shadow-primary-500/25">
+              <span class="text-white font-bold text-lg">S</span>
+            </div>
+            <span class="text-xl font-bold">StrKit</span>
+          </a>
+          <div class="hidden lg:flex items-center gap-1">
+            <a href="../" class="px-4 py-2 text-gray-300 hover:text-white rounded-lg hover:bg-gray-800/50 transition">Docs</a>
+            <a href="./" class="px-4 py-2 text-white font-medium rounded-lg bg-gray-800/50">API</a>
+            <a href="../examples/" class="px-4 py-2 text-gray-300 hover:text-white rounded-lg hover:bg-gray-800/50 transition">Examples</a>
+            <a href="../playground/" class="px-4 py-2 text-gray-300 hover:text-white rounded-lg hover:bg-gray-800/50 transition">Playground</a>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <a href="https://github.com/ersinkoc/strkit" target="_blank" class="p-2 text-gray-400 hover:text-white transition">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+        </div>
+      </div>
     </div>
   </nav>
 
-  <main class="pt-24 pb-16 px-4 max-w-4xl mx-auto">
-    <nav class="text-sm text-gray-500 mb-4">
-      <a href="/docs/api/" class="hover:text-white">API</a> / <span class="text-gray-300">Formatting</span>
-    </nav>
+  <div class="flex pt-16">
+    <aside class="hidden lg:block w-72 fixed left-0 top-16 bottom-0 overflow-y-auto border-r border-gray-800/50 bg-gray-900/30">
+      <div class="p-6">
+        <nav class="space-y-8">
+          <div>
+            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">API Reference</h3>
+            <ul class="space-y-1">
+              <li><a href="./" class="sidebar-link">Overview</a></li>
+              <li><a href="./case.html" class="sidebar-link"><span class="w-2 h-2 rounded-full bg-blue-400 mr-3"></span>Case</a></li>
+              <li><a href="./manipulation.html" class="sidebar-link"><span class="w-2 h-2 rounded-full bg-green-400 mr-3"></span>Manipulation</a></li>
+              <li><a href="./validation.html" class="sidebar-link"><span class="w-2 h-2 rounded-full bg-purple-400 mr-3"></span>Validation</a></li>
+              <li><a href="./sanitization.html" class="sidebar-link"><span class="w-2 h-2 rounded-full bg-orange-400 mr-3"></span>Sanitization</a></li>
+              <li><a href="./formatting.html" class="sidebar-link active"><span class="w-2 h-2 rounded-full bg-pink-400 mr-3"></span>Formatting</a></li>
+              <li><a href="./similarity.html" class="sidebar-link"><span class="w-2 h-2 rounded-full bg-cyan-400 mr-3"></span>Similarity</a></li>
+              <li><a href="./analysis.html" class="sidebar-link"><span class="w-2 h-2 rounded-full bg-yellow-400 mr-3"></span>Analysis</a></li>
+              <li><a href="./pluralization.html" class="sidebar-link"><span class="w-2 h-2 rounded-full bg-red-400 mr-3"></span>Pluralization</a></li>
+              <li><a href="./diff.html" class="sidebar-link"><span class="w-2 h-2 rounded-full bg-indigo-400 mr-3"></span>Diff</a></li>
+              <li><a href="./search.html" class="sidebar-link"><span class="w-2 h-2 rounded-full bg-emerald-400 mr-3"></span>Search</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">On This Page</h3>
+            <ul class="space-y-1 border-l-2 border-gray-800 ml-3">
+              <li><a href="#template" class="toc-link">Template</a></li>
+              <li><a href="#sprintf" class="toc-link">sprintf</a></li>
+              <li><a href="#mask" class="toc-link">Mask</a></li>
+              <li><a href="#ordinalize" class="toc-link">Ordinalize & Currency</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </aside>
 
-    <h1 class="text-4xl font-bold mb-4">Formatting</h1>
-    <p class="text-xl text-gray-400 mb-8">8 methods for string formatting.</p>
+    <main class="flex-1 lg:ml-72 min-h-screen">
+      <div class="max-w-4xl mx-auto px-6 py-12 lg:py-16">
+        <nav class="flex items-center gap-2 text-sm text-gray-500 mb-8">
+          <a href="../../" class="hover:text-white transition">Home</a>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          <a href="./" class="hover:text-white transition">API</a>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          <span class="text-gray-300">Formatting</span>
+        </nav>
 
-    <div class="space-y-8">
-      <section class="bg-gray-900 rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-4">Template</h2>
-        <pre><code class="language-typescript">str.format.template('Hello, {{name}}!', { name: 'World' });
-// 'Hello, World!'
+        <header class="mb-12">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-pink-500/10 flex items-center justify-center">
+              <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-3xl lg:text-4xl font-bold">Formatting</h1>
+              <p class="text-gray-400">str.format namespace</p>
+            </div>
+          </div>
+          <p class="text-xl text-gray-400 leading-relaxed">8 methods for string formatting including templates, sprintf, masks, and locale-aware formatting.</p>
+        </header>
 
-str.format.template('{{user.name}} is {{user.age}}', {
-  user: { name: 'John', age: 30 }
-}); // 'John is 30'
+        <div class="space-y-12">
+          <section id="template" class="method-card p-6 scroll-mt-24">
+            <div class="flex items-center gap-3 mb-4">
+              <h2 class="text-2xl font-bold">Template</h2>
+              <span class="method-badge bg-pink-500/20 text-pink-400">str.format</span>
+            </div>
+            <p class="text-gray-400 mb-6">Mustache-style template interpolation with nested object support.</p>
+            <div class="code-block">
+              <div class="code-header"><span class="text-gray-400 text-sm font-medium">Example</span></div>
+              <pre><code><span class="token-comment">// Basic interpolation</span>
+str.format.<span class="token-function">template</span>(<span class="token-string">'Hello, {{name}}!'</span>, { name: <span class="token-string">'World'</span> });
+<span class="token-comment">// 'Hello, World!'</span>
 
-// Chainable
-S('Hello, {{name}}!').template({ name: 'World' }).value;</code></pre>
-      </section>
+<span class="token-comment">// Nested objects</span>
+str.format.<span class="token-function">template</span>(<span class="token-string">'{{user.name}} is {{user.age}}'</span>, {
+  user: { name: <span class="token-string">'John'</span>, age: <span class="token-number">30</span> }
+}); <span class="token-comment">// 'John is 30'</span>
 
-      <section class="bg-gray-900 rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-4">sprintf</h2>
-        <pre><code class="language-typescript">str.format.sprintf('%s has %d apples', 'John', 5);  // 'John has 5 apples'
-str.format.sprintf('%05d', 42);                     // '00042'
-str.format.sprintf('%.2f', 3.14159);                // '3.14'
-str.format.sprintf('%x', 255);                      // 'ff'</code></pre>
-      </section>
+<span class="token-comment">// Chainable API</span>
+<span class="token-function">S</span>(<span class="token-string">'Hello, {{name}}!'</span>).<span class="token-function">template</span>({ name: <span class="token-string">'World'</span> }).value;</code></pre>
+            </div>
+          </section>
 
-      <section class="bg-gray-900 rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-4">Mask</h2>
-        <pre><code class="language-typescript">str.format.mask('1234567890', '(###) ###-####');  // '(123) 456-7890'
-str.format.mask('4111111111111111', '#### #### #### ####');
-// '4111 1111 1111 1111'
+          <section id="sprintf" class="method-card p-6 scroll-mt-24">
+            <div class="flex items-center gap-3 mb-4">
+              <h2 class="text-2xl font-bold">sprintf</h2>
+              <span class="method-badge bg-pink-500/20 text-pink-400">str.format</span>
+            </div>
+            <p class="text-gray-400 mb-6">C-style printf formatting with format specifiers.</p>
+            <div class="code-block">
+              <div class="code-header"><span class="text-gray-400 text-sm font-medium">Example</span></div>
+              <pre><code><span class="token-comment">// String and number formatting</span>
+str.format.<span class="token-function">sprintf</span>(<span class="token-string">'%s has %d apples'</span>, <span class="token-string">'John'</span>, <span class="token-number">5</span>);  <span class="token-comment">// 'John has 5 apples'</span>
 
-str.format.unmask('(123) 456-7890', '(###) ###-####');  // '1234567890'</code></pre>
-      </section>
+<span class="token-comment">// Zero-padded numbers</span>
+str.format.<span class="token-function">sprintf</span>(<span class="token-string">'%05d'</span>, <span class="token-number">42</span>);                     <span class="token-comment">// '00042'</span>
 
-      <section class="bg-gray-900 rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-4">Ordinalize & Currency</h2>
-        <pre><code class="language-typescript">str.format.ordinalize(1);   // '1st'
-str.format.ordinalize(2);   // '2nd'
-str.format.ordinalize(3);   // '3rd'
-str.format.ordinalize(21);  // '21st'
+<span class="token-comment">// Floating point precision</span>
+str.format.<span class="token-function">sprintf</span>(<span class="token-string">'%.2f'</span>, <span class="token-number">3.14159</span>);                <span class="token-comment">// '3.14'</span>
 
-str.format.currency(1234.56, { locale: 'en-US', currency: 'USD' });
-// '$1,234.56'
-str.format.currency(1234.56, { locale: 'de-DE', currency: 'EUR' });
-// '1.234,56 €'</code></pre>
-      </section>
-    </div>
+<span class="token-comment">// Hexadecimal</span>
+str.format.<span class="token-function">sprintf</span>(<span class="token-string">'%x'</span>, <span class="token-number">255</span>);                      <span class="token-comment">// 'ff'</span>
+str.format.<span class="token-function">sprintf</span>(<span class="token-string">'%X'</span>, <span class="token-number">255</span>);                      <span class="token-comment">// 'FF'</span></code></pre>
+            </div>
+          </section>
 
-    <div class="mt-12 flex justify-between">
-      <a href="/docs/api/sanitization.html" class="text-primary hover:underline">&larr; Sanitization</a>
-      <a href="/docs/api/similarity.html" class="text-primary hover:underline">Similarity &rarr;</a>
-    </div>
-  </main>
-  <script>Prism.highlightAll();</script>
+          <section id="mask" class="method-card p-6 scroll-mt-24">
+            <div class="flex items-center gap-3 mb-4">
+              <h2 class="text-2xl font-bold">Mask</h2>
+              <span class="method-badge bg-pink-500/20 text-pink-400">str.format</span>
+            </div>
+            <p class="text-gray-400 mb-6">Apply masks to format phone numbers, credit cards, and more.</p>
+            <div class="code-block">
+              <div class="code-header"><span class="text-gray-400 text-sm font-medium">Example</span></div>
+              <pre><code><span class="token-comment">// Phone number mask</span>
+str.format.<span class="token-function">mask</span>(<span class="token-string">'1234567890'</span>, <span class="token-string">'(###) ###-####'</span>);
+<span class="token-comment">// '(123) 456-7890'</span>
+
+<span class="token-comment">// Credit card mask</span>
+str.format.<span class="token-function">mask</span>(<span class="token-string">'4111111111111111'</span>, <span class="token-string">'#### #### #### ####'</span>);
+<span class="token-comment">// '4111 1111 1111 1111'</span>
+
+<span class="token-comment">// Remove mask</span>
+str.format.<span class="token-function">unmask</span>(<span class="token-string">'(123) 456-7890'</span>, <span class="token-string">'(###) ###-####'</span>);
+<span class="token-comment">// '1234567890'</span></code></pre>
+            </div>
+          </section>
+
+          <section id="ordinalize" class="method-card p-6 scroll-mt-24">
+            <div class="flex items-center gap-3 mb-4">
+              <h2 class="text-2xl font-bold">Ordinalize & Currency</h2>
+              <span class="method-badge bg-pink-500/20 text-pink-400">str.format</span>
+            </div>
+            <p class="text-gray-400 mb-6">Format ordinal numbers and currency with locale support.</p>
+            <div class="code-block">
+              <div class="code-header"><span class="text-gray-400 text-sm font-medium">Example</span></div>
+              <pre><code><span class="token-comment">// Ordinal numbers</span>
+str.format.<span class="token-function">ordinalize</span>(<span class="token-number">1</span>);   <span class="token-comment">// '1st'</span>
+str.format.<span class="token-function">ordinalize</span>(<span class="token-number">2</span>);   <span class="token-comment">// '2nd'</span>
+str.format.<span class="token-function">ordinalize</span>(<span class="token-number">3</span>);   <span class="token-comment">// '3rd'</span>
+str.format.<span class="token-function">ordinalize</span>(<span class="token-number">21</span>);  <span class="token-comment">// '21st'</span>
+
+<span class="token-comment">// With locale</span>
+str.format.<span class="token-function">ordinalize</span>(<span class="token-number">1</span>, <span class="token-string">'de'</span>); <span class="token-comment">// '1.'</span>
+str.format.<span class="token-function">ordinalize</span>(<span class="token-number">1</span>, <span class="token-string">'fr'</span>); <span class="token-comment">// '1er'</span>
+
+<span class="token-comment">// Currency formatting</span>
+str.format.<span class="token-function">currency</span>(<span class="token-number">1234.56</span>, { locale: <span class="token-string">'en-US'</span>, currency: <span class="token-string">'USD'</span> });
+<span class="token-comment">// '$1,234.56'</span>
+
+str.format.<span class="token-function">currency</span>(<span class="token-number">1234.56</span>, { locale: <span class="token-string">'de-DE'</span>, currency: <span class="token-string">'EUR'</span> });
+<span class="token-comment">// '1.234,56 EUR'</span></code></pre>
+            </div>
+          </section>
+        </div>
+
+        <nav class="flex items-center justify-between pt-12 border-t border-gray-800 mt-12">
+          <a href="./sanitization.html" class="flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-white transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Sanitization
+          </a>
+          <a href="./similarity.html" class="flex items-center gap-2 px-4 py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-lg transition">
+            Similarity
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </nav>
+      </div>
+
+      <footer class="border-t border-gray-800 mt-16">
+        <div class="max-w-4xl mx-auto px-6 py-8">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2 text-gray-400 text-sm">
+              <span>Built with</span>
+              <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              <span>by</span>
+              <a href="https://github.com/ersinkoc" class="text-primary-400 hover:text-primary-300">@ersinkoc</a>
+            </div>
+            <div class="flex items-center gap-6 text-sm text-gray-500">
+              <a href="https://github.com/ersinkoc/strkit" class="hover:text-white transition">GitHub</a>
+              <a href="https://www.npmjs.com/package/@oxog/strkit" class="hover:text-white transition">npm</a>
+              <span>MIT License</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
 </body>
 </html>
