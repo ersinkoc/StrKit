@@ -309,4 +309,186 @@ describe('Coverage Gap Tests', () => {
       expect(() => registerPlugin(dependentPlugin)).not.toThrow();
     });
   });
+
+  describe('Case Plugin - locale branch coverage', () => {
+    it('should handle titleCase with locale', () => {
+      const result = str.case.title('hello world', { locale: 'en' });
+      expect(result).toBe('Hello World');
+    });
+
+    it('should handle pascalCase with locale', () => {
+      const result = str.case.pascal('hello world', { locale: 'en' });
+      expect(result).toBe('HelloWorld');
+    });
+
+    it('should handle headerCase with locale', () => {
+      const result = str.case.header('hello world', { locale: 'en' });
+      expect(result).toBe('Hello-World');
+    });
+
+    it('should handle capitalize with locale', () => {
+      const result = str.case.capitalize('hello', { locale: 'tr' });
+      expect(result).toBe('Hello');
+    });
+
+    it('should handle decapitalize with locale', () => {
+      const result = str.case.decapitalize('Hello', { locale: 'tr' });
+      expect(result).toBe('hello');
+    });
+  });
+
+  describe('Similarity Plugin - edge cases', () => {
+    it('should handle jaroWinkler with empty strings', () => {
+      expect(str.similarity.jaroWinkler('', '')).toBe(1);
+      expect(str.similarity.jaroWinkler('abc', '')).toBe(0);
+      expect(str.similarity.jaroWinkler('', 'abc')).toBe(0);
+    });
+
+    it('should handle jaroWinkler with identical strings', () => {
+      expect(str.similarity.jaroWinkler('hello', 'hello')).toBe(1);
+    });
+
+    it('should handle cosine with empty strings', () => {
+      expect(str.similarity.cosine('', '')).toBe(1);
+      expect(str.similarity.cosine('abc', '')).toBe(0);
+    });
+
+    it('should handle hamming with different lengths', () => {
+      expect(() => str.similarity.hamming('abc', 'abcd')).toThrow('Hamming distance requires strings of equal length');
+    });
+
+    it('should handle hamming with equal length strings', () => {
+      expect(str.similarity.hamming('abc', 'abc')).toBe(0);
+      expect(str.similarity.hamming('abc', 'abd')).toBe(1);
+    });
+  });
+
+  describe('Validation Plugin - edge cases', () => {
+    it('should validate phone formats', () => {
+      expect(str.validate.phone('+1-555-555-5555')).toBe(true);
+      expect(str.validate.phone('invalid')).toBe(false);
+    });
+
+    it('should validate credit card formats', () => {
+      expect(str.validate.creditCard('4111111111111111')).toBe(true);
+      expect(str.validate.creditCard('invalid')).toBe(false);
+    });
+
+    it('should validate hex format', () => {
+      expect(str.validate.hex('ff00ff')).toBe(true);
+      expect(str.validate.hex('zzzzzz')).toBe(false);
+    });
+
+    it('should validate base64 format', () => {
+      expect(str.validate.base64('SGVsbG8gV29ybGQ=')).toBe(true);
+      expect(str.validate.base64('not base64!!!')).toBe(false);
+    });
+  });
+
+  describe('Manipulation Plugin - edge cases', () => {
+    it('should handle wrap with custom break', () => {
+      const result = str.manipulation.wrap('hello world test string', 12);
+      expect(typeof result).toBe('string');
+    });
+
+    it('should handle insert with index', () => {
+      const result = str.manipulation.insert('hello', 5, ' world');
+      expect(result).toBe('hello world');
+    });
+  });
+
+  describe('Diff Plugin - additional edge cases', () => {
+    it('should handle createPatch with modifications', () => {
+      const original = 'line1\nline2\nline3';
+      const modified = 'line1\nmodified\nline3';
+      const result = str.diff.createPatch('test.txt', original, modified);
+      expect(result).toContain('-line2');
+      expect(result).toContain('+modified');
+    });
+
+    it('should handle diffWords with punctuation', () => {
+      const result = str.diff.diffWords('Hello, world!', 'Hello, universe!');
+      expect(result.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Search Plugin - additional edge cases', () => {
+    it('should handle findSimilar with threshold', () => {
+      const result = str.similarity.findSimilar('helo', ['hello', 'world', 'help'], { threshold: 0.5 });
+      expect(result.length).toBeGreaterThan(0);
+    });
+
+    it('should handle indexOf with fromIndex beyond string length', () => {
+      const result = str.search.indexOf('hello', 'l', { fromIndex: 100 });
+      expect(result).toBe(-1);
+    });
+  });
+
+  describe('Sanitization Plugin - additional edge cases', () => {
+    it('should handle stripHtml with nested tags', () => {
+      const result = str.sanitize.stripHtml('<div><p>Hello</p></div>');
+      expect(result).toBe('Hello');
+    });
+
+    it('should handle escapeHtml with all special chars', () => {
+      const result = str.sanitize.escapeHtml('<>&"\'/');
+      expect(result).not.toContain('<');
+      expect(result).not.toContain('>');
+    });
+  });
+
+  describe('Pluralization Plugin - additional edge cases', () => {
+    it('should handle words ending in -y preceded by consonant', () => {
+      expect(str.plural.plural('baby')).toBe('babies');
+      expect(str.plural.singular('babies')).toBe('baby');
+    });
+
+    it('should handle words ending in -y preceded by vowel', () => {
+      expect(str.plural.plural('day')).toBe('days');
+    });
+
+    it('should handle words ending in -o', () => {
+      expect(str.plural.plural('hero')).toBe('heroes');
+      expect(str.plural.plural('photo')).toBe('photos');
+    });
+  });
+
+  describe('Chain API - comprehensive method coverage', () => {
+    it('should chain multiple case methods', () => {
+      const result = S('  HELLO WORLD  ')
+        .trim()
+        .camelCase()
+        .value;
+      expect(result).toBe('helloWorld');
+    });
+
+    it('should chain validation methods', () => {
+      expect(S('test@example.com').isEmail()).toBe(true);
+      expect(S('https://example.com').isUrl()).toBe(true);
+      expect(S('192.168.1.1').isIp()).toBe(true);
+    });
+
+    it('should chain manipulation and formatting', () => {
+      const result = S('hello')
+        .padStart(10, '*')
+        .reverse()
+        .value;
+      expect(result).toBe('olleh*****');
+    });
+
+    it('should use words() method', () => {
+      const result = S('hello world').words();
+      expect(result).toEqual(['hello', 'world']);
+    });
+
+    it('should use chars() method', () => {
+      const result = S('hi').chars();
+      expect(result).toEqual(['h', 'i']);
+    });
+
+    it('should use lines() method', () => {
+      const result = S('line1\nline2').lines();
+      expect(result).toEqual(['line1', 'line2']);
+    });
+  });
 });
