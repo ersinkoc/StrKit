@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Examples - StrKit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#6366f1' } } } }</script>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+  <style>pre[class*="language-"]{margin:0;border-radius:0.5rem;font-size:0.875rem;}</style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-lg border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center space-x-2">
+        <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span class="text-xl font-bold">StrKit</span>
+      </a>
+      <div class="flex items-center space-x-6">
+        <a href="/docs/" class="text-gray-300 hover:text-white">Docs</a>
+        <a href="/docs/api/" class="text-gray-300 hover:text-white">API</a>
+        <a href="/docs/examples/" class="text-white font-medium">Examples</a>
+        <a href="/docs/playground/" class="text-gray-300 hover:text-white">Playground</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="pt-24 pb-16 px-4 max-w-4xl mx-auto">
+    <h1 class="text-4xl font-bold mb-4">Examples</h1>
+    <p class="text-xl text-gray-400 mb-8">Real-world usage examples for StrKit.</p>
+
+    <div class="space-y-8">
+      <!-- Form Validation -->
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">Form Validation</h2>
+        <p class="text-gray-400 mb-4">Validate user input with built-in validators.</p>
+        <pre><code class="language-typescript">import { str } from '@oxog/strkit';
+
+function validateForm(data: { email: string; username: string; password: string }) {
+  const errors: string[] = [];
+
+  if (!str.validate.isEmail(data.email)) {
+    errors.push('Invalid email address');
+  }
+
+  if (!str.validate.isAlphanumeric(data.username)) {
+    errors.push('Username must be alphanumeric');
+  }
+
+  if (data.password.length < 8) {
+    errors.push('Password must be at least 8 characters');
+  }
+
+  // Check password strength using entropy
+  if (str.analysis.entropy(data.password) < 3) {
+    errors.push('Password is too weak');
+  }
+
+  return { valid: errors.length === 0, errors };
+}</code></pre>
+      </section>
+
+      <!-- URL Slug Generator -->
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">URL Slug Generator</h2>
+        <p class="text-gray-400 mb-4">Create SEO-friendly URLs from titles.</p>
+        <pre><code class="language-typescript">import { S } from '@oxog/strkit';
+
+function createSlug(title: string): string {
+  return S(title)
+    .trim()
+    .toLowerCase()
+    .replaceAll(/[^\w\s-]/g, '')  // Remove special chars
+    .replaceAll(/\s+/g, '-')       // Replace spaces with dashes
+    .replaceAll(/-+/g, '-')        // Remove duplicate dashes
+    .value();
+}
+
+createSlug('Hello World! This is a Test');
+// 'hello-world-this-is-a-test'
+
+createSlug('  Café & Restaurant - Best Food!  ');
+// 'caf-restaurant-best-food'</code></pre>
+      </section>
+
+      <!-- Content Sanitization -->
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">Content Sanitization</h2>
+        <p class="text-gray-400 mb-4">Sanitize user-generated content for security.</p>
+        <pre><code class="language-typescript">import { str } from '@oxog/strkit';
+
+function sanitizeComment(html: string): string {
+  // Remove all HTML tags
+  let clean = str.sanitize.stripTags(html);
+
+  // Escape any remaining HTML entities
+  clean = str.sanitize.escapeHtml(clean);
+
+  // Normalize whitespace
+  clean = str.sanitize.normalizeWhitespace(clean);
+
+  // Trim to max length
+  clean = str.manipulation.truncate(clean, 500, '...');
+
+  return clean;
+}
+
+sanitizeComment('&lt;script&gt;alert("xss")&lt;/script&gt;Hello &lt;b&gt;World&lt;/b&gt;');
+// 'Hello World'</code></pre>
+      </section>
+
+      <!-- Fuzzy Search -->
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">Fuzzy Search</h2>
+        <p class="text-gray-400 mb-4">Find similar strings with typo tolerance.</p>
+        <pre><code class="language-typescript">import { str } from '@oxog/strkit';
+
+const products = ['iPhone 15 Pro', 'Samsung Galaxy S24', 'Google Pixel 8', 'OnePlus 12'];
+
+function searchProducts(query: string) {
+  const results = str.similarity.findSimilar(query, products, {
+    threshold: 0.3,
+    algorithm: 'levenshtein'
+  });
+
+  return results.sort((a, b) => b.score - a.score);
+}
+
+searchProducts('iphone');
+// [{ match: 'iPhone 15 Pro', score: 0.46 }]
+
+searchProducts('pixl');
+// [{ match: 'Google Pixel 8', score: 0.36 }]</code></pre>
+      </section>
+
+      <!-- Internationalization -->
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">Internationalization (i18n)</h2>
+        <p class="text-gray-400 mb-4">Format strings for different locales.</p>
+        <pre><code class="language-typescript">import { str } from '@oxog/strkit';
+
+// Turkish locale
+str.case.lower('ISTANBUL', 'tr');      // 'ıstanbul' (dotless i)
+str.case.upper('istanbul', 'tr');      // 'İSTANBUL' (dotted I)
+str.case.capitalize('çay', 'tr');      // 'Çay'
+
+// German locale
+str.case.upper('straße', 'de');        // 'STRASSE' (ß → SS)
+
+// Use current locale
+str.case.title('hello world', true);   // Uses browser/system locale</code></pre>
+      </section>
+
+      <!-- Text Diff & Patching -->
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">Text Diff & Patching</h2>
+        <p class="text-gray-400 mb-4">Compare and patch text documents.</p>
+        <pre><code class="language-typescript">import { str } from '@oxog/strkit';
+
+const original = `Line 1
+Line 2
+Line 3`;
+
+const modified = `Line 1
+Line 2 - updated
+Line 3
+Line 4`;
+
+// Create a patch
+const patch = str.diff.createPatch('file.txt', original, modified);
+
+// Apply patch to original
+const result = str.diff.applyPatch(original, patch);
+// result === modified
+
+// Show changes
+const changes = str.diff.diffLines(original, modified);
+// [
+//   { type: 'equal', value: 'Line 1\n' },
+//   { type: 'remove', value: 'Line 2\n' },
+//   { type: 'add', value: 'Line 2 - updated\n' },
+//   { type: 'equal', value: 'Line 3\n' },
+//   { type: 'add', value: 'Line 4' }
+// ]</code></pre>
+      </section>
+
+      <!-- Reading Time Calculator -->
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">Reading Time Calculator</h2>
+        <p class="text-gray-400 mb-4">Estimate reading time for articles.</p>
+        <pre><code class="language-typescript">import { str } from '@oxog/strkit';
+
+function getArticleStats(content: string) {
+  return {
+    wordCount: str.analysis.wordCount(content),
+    charCount: str.analysis.charCount(content),
+    sentences: str.analysis.sentenceCount(content),
+    paragraphs: str.analysis.paragraphCount(content),
+    readingTime: Math.ceil(str.analysis.readingTime(content)),
+    speakingTime: Math.ceil(str.analysis.speakingTime(content))
+  };
+}
+
+const article = `Lorem ipsum dolor sit amet...`; // long article
+
+getArticleStats(article);
+// {
+//   wordCount: 1500,
+//   charCount: 8500,
+//   sentences: 75,
+//   paragraphs: 12,
+//   readingTime: 8,      // 8 minutes to read
+//   speakingTime: 10     // 10 minutes to speak
+// }</code></pre>
+      </section>
+
+      <!-- Dynamic Pluralization -->
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">Dynamic Pluralization</h2>
+        <p class="text-gray-400 mb-4">Handle singular/plural forms dynamically.</p>
+        <pre><code class="language-typescript">import { str } from '@oxog/strkit';
+
+function formatCount(count: number, noun: string): string {
+  return str.plural.plural(noun, count, true);
+}
+
+formatCount(0, 'item');    // '0 items'
+formatCount(1, 'item');    // '1 item'
+formatCount(5, 'item');    // '5 items'
+
+formatCount(1, 'child');   // '1 child'
+formatCount(3, 'child');   // '3 children'
+
+formatCount(1, 'person');  // '1 person'
+formatCount(10, 'person'); // '10 people'
+
+// Add custom irregular
+str.plural.addIrregular('cactus', 'cacti');
+formatCount(2, 'cactus');  // '2 cacti'</code></pre>
+      </section>
+    </div>
+
+    <div class="mt-12 flex justify-between">
+      <a href="/docs/api/" class="text-primary hover:underline">&larr; API Reference</a>
+      <a href="/docs/playground/" class="text-primary hover:underline">Playground &rarr;</a>
+    </div>
+  </main>
+  <script>Prism.highlightAll();</script>
+</body>
+</html>

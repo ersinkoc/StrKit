@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search - StrKit API</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#6366f1' } } } }</script>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+  <style>pre[class*="language-"]{margin:0;border-radius:0.5rem;font-size:0.875rem;}</style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-lg border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center space-x-2">
+        <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span class="text-xl font-bold">StrKit</span>
+      </a>
+    </div>
+  </nav>
+
+  <main class="pt-24 pb-16 px-4 max-w-4xl mx-auto">
+    <nav class="text-sm text-gray-500 mb-4">
+      <a href="/docs/api/" class="hover:text-white">API</a> / <span class="text-gray-300">Search</span>
+    </nav>
+
+    <h1 class="text-4xl font-bold mb-4">Search</h1>
+    <p class="text-xl text-gray-400 mb-8">10 methods for searching within strings.</p>
+
+    <div class="space-y-8">
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Basic Search</h2>
+        <pre><code class="language-typescript">str.search.contains('hello world', 'world');     // true
+str.search.contains('hello world', 'World', {
+  caseSensitive: false
+}); // true
+
+str.search.startsWith('hello world', 'hello');   // true
+str.search.endsWith('hello world', 'world');     // true</code></pre>
+      </section>
+
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Index & Position</h2>
+        <pre><code class="language-typescript">str.search.indexOf('hello world', 'o');          // 4
+str.search.lastIndexOf('hello world', 'o');      // 7
+str.search.indexOf('hello world', 'o', { fromIndex: 5 }); // 7
+
+str.search.positions('abracadabra', 'a');        // [0, 3, 5, 7, 10]
+str.search.countOccurrences('abracadabra', 'a'); // 5</code></pre>
+      </section>
+
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Regex Match</h2>
+        <pre><code class="language-typescript">str.search.match('hello 123 world', /\d+/);      // '123'
+str.search.matchAll('hello 123 world 456', /\d+/g);
+// ['123', '456']</code></pre>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-4">All Methods</h2>
+        <div class="grid md:grid-cols-2 gap-2 text-sm">
+          <div class="bg-gray-900 p-3 rounded"><code>contains</code> - Check if contains</div>
+          <div class="bg-gray-900 p-3 rounded"><code>startsWith</code> - Check start</div>
+          <div class="bg-gray-900 p-3 rounded"><code>endsWith</code> - Check end</div>
+          <div class="bg-gray-900 p-3 rounded"><code>indexOf</code> - First occurrence index</div>
+          <div class="bg-gray-900 p-3 rounded"><code>lastIndexOf</code> - Last occurrence index</div>
+          <div class="bg-gray-900 p-3 rounded"><code>countOccurrences</code> - Count matches</div>
+          <div class="bg-gray-900 p-3 rounded"><code>positions</code> - All positions</div>
+          <div class="bg-gray-900 p-3 rounded"><code>match</code> - First regex match</div>
+          <div class="bg-gray-900 p-3 rounded"><code>matchAll</code> - All regex matches</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="mt-12 flex justify-between">
+      <a href="/docs/api/diff.html" class="text-primary hover:underline">&larr; Diff</a>
+      <a href="/docs/api/" class="text-primary hover:underline">API Overview &rarr;</a>
+    </div>
+  </main>
+  <script>Prism.highlightAll();</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+# Source
+src/
+
+# Tests
+tests/
+coverage/
+vitest.config.ts
+
+# Documentation source
+website/
+examples/
+*.md
+!README.md
+
+# Config
+.gitignore
+.eslintrc.json
+.prettierrc
+tsconfig.json
+tsup.config.ts
+
+# IDE
+.idea/
+.vscode/
+
+# Misc
+*.tgz
+.cache/

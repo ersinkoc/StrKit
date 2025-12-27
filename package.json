@@ -1,0 +1,101 @@
+{
+  "name": "@oxog/strkit",
+  "version": "1.0.0",
+  "description": "The ultimate zero-dependency string manipulation toolkit for JavaScript/TypeScript. 115+ methods across 10 categories with 4 flexible API styles, i18n support, and micro-kernel plugin architecture.",
+  "author": "ersinkoc",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ersinkoc/strkit"
+  },
+  "homepage": "https://strkit.oxog.dev",
+  "bugs": {
+    "url": "https://github.com/ersinkoc/strkit/issues"
+  },
+  "keywords": [
+    "string",
+    "string-manipulation",
+    "string-utils",
+    "string-toolkit",
+    "camelcase",
+    "kebabcase",
+    "snakecase",
+    "slugify",
+    "sanitize",
+    "validate",
+    "levenshtein",
+    "similarity",
+    "diff",
+    "pluralize",
+    "i18n",
+    "zero-dependency",
+    "typescript"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./extend": {
+      "import": {
+        "types": "./dist/extend.d.mts",
+        "default": "./dist/extend.mjs"
+      },
+      "require": {
+        "types": "./dist/extend.d.cts",
+        "default": "./dist/extend.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "./dist/extend.mjs",
+    "./dist/extend.cjs",
+    "./src/locales/index.ts",
+    "./dist/chunk-*.mjs",
+    "./dist/chunk-*.cjs"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "prepublishOnly": "npm run build && npm run test:run"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "prettier": "^3.1.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitepress": "^1.6.4",
+    "vitest": "^1.0.0"
+  }
+}

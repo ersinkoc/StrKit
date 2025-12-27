@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Started - StrKit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { primary: '#6366f1', secondary: '#8b5cf6' } } }
+    }
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+    pre[class*="language-"] { margin: 0; border-radius: 0.5rem; }
+  </style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-lg border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <a href="/" class="flex items-center space-x-2">
+            <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            <span class="text-xl font-bold">StrKit</span>
+          </a>
+        </div>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="/docs/" class="text-white font-medium">Docs</a>
+          <a href="/docs/api/" class="text-gray-300 hover:text-white transition">API</a>
+          <a href="/docs/examples/" class="text-gray-300 hover:text-white transition">Examples</a>
+          <a href="/docs/playground/" class="text-gray-300 hover:text-white transition">Playground</a>
+          <a href="https://github.com/ersinkoc/strkit" class="text-gray-300 hover:text-white transition" target="_blank">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="flex pt-16">
+    <!-- Sidebar -->
+    <aside class="hidden lg:block w-64 fixed left-0 top-16 bottom-0 overflow-y-auto border-r border-gray-800 p-6">
+      <nav class="space-y-6">
+        <div>
+          <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Introduction</h3>
+          <ul class="space-y-2">
+            <li><a href="/docs/" class="text-primary font-medium">Getting Started</a></li>
+            <li><a href="/docs/api-styles.html" class="text-gray-300 hover:text-white">API Styles</a></li>
+            <li><a href="/docs/i18n.html" class="text-gray-300 hover:text-white">i18n Support</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">API Reference</h3>
+          <ul class="space-y-2">
+            <li><a href="/docs/api/" class="text-gray-300 hover:text-white">Overview</a></li>
+            <li><a href="/docs/api/case.html" class="text-gray-300 hover:text-white">Case</a></li>
+            <li><a href="/docs/api/manipulation.html" class="text-gray-300 hover:text-white">Manipulation</a></li>
+            <li><a href="/docs/api/validation.html" class="text-gray-300 hover:text-white">Validation</a></li>
+            <li><a href="/docs/api/sanitization.html" class="text-gray-300 hover:text-white">Sanitization</a></li>
+            <li><a href="/docs/api/formatting.html" class="text-gray-300 hover:text-white">Formatting</a></li>
+            <li><a href="/docs/api/similarity.html" class="text-gray-300 hover:text-white">Similarity</a></li>
+            <li><a href="/docs/api/analysis.html" class="text-gray-300 hover:text-white">Analysis</a></li>
+            <li><a href="/docs/api/pluralization.html" class="text-gray-300 hover:text-white">Pluralization</a></li>
+            <li><a href="/docs/api/diff.html" class="text-gray-300 hover:text-white">Diff</a></li>
+            <li><a href="/docs/api/search.html" class="text-gray-300 hover:text-white">Search</a></li>
+          </ul>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 lg:ml-64 p-8 max-w-4xl">
+      <h1 class="text-4xl font-bold mb-6">Getting Started</h1>
+
+      <div class="prose prose-invert max-w-none">
+        <h2 class="text-2xl font-semibold mt-8 mb-4">Installation</h2>
+        <p class="text-gray-400 mb-4">Install StrKit using your favorite package manager:</p>
+
+        <div class="space-y-3 mb-8">
+          <div class="bg-gray-900 rounded-lg p-4">
+            <pre><code class="language-bash">npm install @oxog/strkit</code></pre>
+          </div>
+          <div class="bg-gray-900 rounded-lg p-4">
+            <pre><code class="language-bash">yarn add @oxog/strkit</code></pre>
+          </div>
+          <div class="bg-gray-900 rounded-lg p-4">
+            <pre><code class="language-bash">pnpm add @oxog/strkit</code></pre>
+          </div>
+        </div>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4">Quick Start</h2>
+
+        <h3 class="text-xl font-medium mt-6 mb-3">Namespace API</h3>
+        <p class="text-gray-400 mb-4">Access methods through organized namespaces:</p>
+        <div class="bg-gray-900 rounded-lg p-4 mb-6">
+          <pre><code class="language-typescript">import { str } from '@oxog/strkit';
+
+// Case conversion
+str.case.camel('hello world');     // 'helloWorld'
+str.case.kebab('helloWorld');      // 'hello-world'
+
+// Validation
+str.validate.email('test@example.com');  // true
+str.validate.url('https://example.com'); // true
+
+// Similarity
+str.similarity.levenshtein('kitten', 'sitting');  // 3</code></pre>
+        </div>
+
+        <h3 class="text-xl font-medium mt-6 mb-3">Direct Import (Tree-Shakeable)</h3>
+        <p class="text-gray-400 mb-4">Import only the functions you need:</p>
+        <div class="bg-gray-900 rounded-lg p-4 mb-6">
+          <pre><code class="language-typescript">import { camelCase, isEmail, slugify } from '@oxog/strkit';
+
+camelCase('hello world');   // 'helloWorld'
+isEmail('test@test.com');   // true
+slugify('Hello World!');    // 'hello-world'</code></pre>
+        </div>
+
+        <h3 class="text-xl font-medium mt-6 mb-3">Chainable API</h3>
+        <p class="text-gray-400 mb-4">Fluent, immutable method chaining:</p>
+        <div class="bg-gray-900 rounded-lg p-4 mb-6">
+          <pre><code class="language-typescript">import { S } from '@oxog/strkit';
+
+const result = S('  Hello World  ')
+  .trim()
+  .lower()
+  .camelCase()
+  .truncate(8)
+  .value;  // 'helloW...'
+
+// Immutable - original is unchanged
+const a = S('hello');
+const b = a.upper();
+console.log(a.value);  // 'hello'
+console.log(b.value);  // 'HELLO'</code></pre>
+        </div>
+
+        <h3 class="text-xl font-medium mt-6 mb-3">Prototype Extension</h3>
+        <p class="text-gray-400 mb-4">Extend native String prototype (opt-in):</p>
+        <div class="bg-gray-900 rounded-lg p-4 mb-6">
+          <pre><code class="language-typescript">import '@oxog/strkit/extend';
+
+'hello world'.camelCase();    // 'helloWorld'
+'test@test.com'.isEmail();    // true
+'  hello  '.trim().upper();   // 'HELLO'</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4">TypeScript Support</h2>
+        <p class="text-gray-400 mb-4">StrKit is written in TypeScript with full type definitions:</p>
+        <div class="bg-gray-900 rounded-lg p-4 mb-6">
+          <pre><code class="language-typescript">import { S, str, type StrKitChain, type DiffResult } from '@oxog/strkit';
+
+const chain: StrKitChain = S('hello');
+const result: DiffResult[] = str.diff.diffChars('a', 'b');</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4">Next Steps</h2>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="/docs/api-styles.html" class="text-primary hover:underline">Learn about API styles in detail</a></li>
+          <li><a href="/docs/api/" class="text-primary hover:underline">Explore the full API reference</a></li>
+          <li><a href="/docs/i18n.html" class="text-primary hover:underline">Configure internationalization</a></li>
+          <li><a href="/docs/playground/" class="text-primary hover:underline">Try the interactive playground</a></li>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <script>Prism.highlightAll();</script>
+</body>
+</html>

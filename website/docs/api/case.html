@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Conversion - StrKit API</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#6366f1' } } } }</script>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+  <style>pre[class*="language-"]{margin:0;border-radius:0.5rem;font-size:0.875rem;}</style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-lg border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center space-x-2">
+        <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span class="text-xl font-bold">StrKit</span>
+      </a>
+      <div class="flex items-center space-x-6">
+        <a href="/docs/" class="text-gray-300 hover:text-white">Docs</a>
+        <a href="/docs/api/" class="text-white font-medium">API</a>
+        <a href="/docs/playground/" class="text-gray-300 hover:text-white">Playground</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="pt-24 pb-16 px-4 max-w-4xl mx-auto">
+    <nav class="text-sm text-gray-500 mb-4">
+      <a href="/docs/api/" class="hover:text-white">API</a> / <span class="text-gray-300">Case</span>
+    </nav>
+
+    <h1 class="text-4xl font-bold mb-4">Case Conversion</h1>
+    <p class="text-xl text-gray-400 mb-8">14 methods for transforming string case with locale support.</p>
+
+    <div class="space-y-12">
+      <!-- camelCase -->
+      <section class="border-b border-gray-800 pb-8">
+        <h2 class="text-2xl font-semibold mb-3" id="camelCase">camelCase</h2>
+        <p class="text-gray-400 mb-4">Convert string to camelCase.</p>
+        <div class="bg-gray-900 rounded-lg p-4 mb-4">
+          <pre><code class="language-typescript">str.case.camel('hello world');      // 'helloWorld'
+str.case.camel('foo-bar-baz');      // 'fooBarBaz'
+str.case.camel('FOO_BAR');          // 'fooBar'
+
+// Direct import
+import { camelCase } from '@oxog/strkit';
+camelCase('hello world');           // 'helloWorld'
+
+// Chainable
+S('hello world').camelCase().value; // 'helloWorld'</code></pre>
+        </div>
+      </section>
+
+      <!-- kebabCase -->
+      <section class="border-b border-gray-800 pb-8">
+        <h2 class="text-2xl font-semibold mb-3" id="kebabCase">kebabCase</h2>
+        <p class="text-gray-400 mb-4">Convert string to kebab-case.</p>
+        <div class="bg-gray-900 rounded-lg p-4 mb-4">
+          <pre><code class="language-typescript">str.case.kebab('helloWorld');       // 'hello-world'
+str.case.kebab('foo_bar_baz');      // 'foo-bar-baz'
+
+// Chainable
+S('helloWorld').kebabCase().value;  // 'hello-world'</code></pre>
+        </div>
+      </section>
+
+      <!-- snakeCase -->
+      <section class="border-b border-gray-800 pb-8">
+        <h2 class="text-2xl font-semibold mb-3" id="snakeCase">snakeCase</h2>
+        <p class="text-gray-400 mb-4">Convert string to snake_case.</p>
+        <div class="bg-gray-900 rounded-lg p-4 mb-4">
+          <pre><code class="language-typescript">str.case.snake('helloWorld');       // 'hello_world'
+str.case.snake('foo-bar-baz');      // 'foo_bar_baz'
+
+// Chainable
+S('helloWorld').snakeCase().value;  // 'hello_world'</code></pre>
+        </div>
+      </section>
+
+      <!-- pascalCase -->
+      <section class="border-b border-gray-800 pb-8">
+        <h2 class="text-2xl font-semibold mb-3" id="pascalCase">pascalCase</h2>
+        <p class="text-gray-400 mb-4">Convert string to PascalCase.</p>
+        <div class="bg-gray-900 rounded-lg p-4 mb-4">
+          <pre><code class="language-typescript">str.case.pascal('hello world');     // 'HelloWorld'
+str.case.pascal('foo-bar-baz');     // 'FooBarBaz'
+
+// Chainable
+S('hello world').pascalCase().value; // 'HelloWorld'</code></pre>
+        </div>
+      </section>
+
+      <!-- titleCase -->
+      <section class="border-b border-gray-800 pb-8">
+        <h2 class="text-2xl font-semibold mb-3" id="titleCase">titleCase</h2>
+        <p class="text-gray-400 mb-4">Convert string to Title Case.</p>
+        <div class="bg-gray-900 rounded-lg p-4 mb-4">
+          <pre><code class="language-typescript">str.case.title('hello world');      // 'Hello World'
+str.case.title('the quick brown fox'); // 'The Quick Brown Fox'
+
+// Chainable
+S('hello world').titleCase().value; // 'Hello World'</code></pre>
+        </div>
+      </section>
+
+      <!-- upper/lower -->
+      <section class="border-b border-gray-800 pb-8">
+        <h2 class="text-2xl font-semibold mb-3" id="upper">upper / lower</h2>
+        <p class="text-gray-400 mb-4">Convert to uppercase or lowercase with locale support.</p>
+        <div class="bg-gray-900 rounded-lg p-4 mb-4">
+          <pre><code class="language-typescript">str.case.upper('hello');            // 'HELLO'
+str.case.lower('HELLO');            // 'hello'
+
+// With Turkish locale
+str.case.upper('istanbul', { locale: 'tr' }); // 'İSTANBUL'
+str.case.lower('ISTANBUL', { locale: 'tr' }); // 'ıstanbul'
+
+// Chainable
+S('hello').upper().value;           // 'HELLO'
+S('HELLO').lower().value;           // 'hello'</code></pre>
+        </div>
+      </section>
+
+      <!-- constantCase -->
+      <section class="border-b border-gray-800 pb-8">
+        <h2 class="text-2xl font-semibold mb-3" id="constantCase">constantCase</h2>
+        <p class="text-gray-400 mb-4">Convert to CONSTANT_CASE (screaming snake case).</p>
+        <div class="bg-gray-900 rounded-lg p-4 mb-4">
+          <pre><code class="language-typescript">str.case.constant('hello world');   // 'HELLO_WORLD'
+str.case.constant('fooBar');        // 'FOO_BAR'
+
+// Chainable
+S('hello world').constantCase().value; // 'HELLO_WORLD'</code></pre>
+        </div>
+      </section>
+
+      <!-- All Methods -->
+      <section>
+        <h2 class="text-2xl font-semibold mb-4">All Methods</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-gray-900">
+              <tr>
+                <th class="px-4 py-3 text-sm font-medium">Method</th>
+                <th class="px-4 py-3 text-sm font-medium">Description</th>
+                <th class="px-4 py-3 text-sm font-medium">Example</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800">
+              <tr><td class="px-4 py-3"><code>camel</code></td><td class="px-4 py-3 text-gray-400">camelCase</td><td class="px-4 py-3"><code>'helloWorld'</code></td></tr>
+              <tr><td class="px-4 py-3"><code>kebab</code></td><td class="px-4 py-3 text-gray-400">kebab-case</td><td class="px-4 py-3"><code>'hello-world'</code></td></tr>
+              <tr><td class="px-4 py-3"><code>snake</code></td><td class="px-4 py-3 text-gray-400">snake_case</td><td class="px-4 py-3"><code>'hello_world'</code></td></tr>
+              <tr><td class="px-4 py-3"><code>pascal</code></td><td class="px-4 py-3 text-gray-400">PascalCase</td><td class="px-4 py-3"><code>'HelloWorld'</code></td></tr>
+              <tr><td class="px-4 py-3"><code>title</code></td><td class="px-4 py-3 text-gray-400">Title Case</td><td class="px-4 py-3"><code>'Hello World'</code></td></tr>
+              <tr><td class="px-4 py-3"><code>sentence</code></td><td class="px-4 py-3 text-gray-400">Sentence case</td><td class="px-4 py-3"><code>'Hello world'</code></td></tr>
+              <tr><td class="px-4 py-3"><code>constant</code></td><td class="px-4 py-3 text-gray-400">CONSTANT_CASE</td><td class="px-4 py-3"><code>'HELLO_WORLD'</code></td></tr>
+              <tr><td class="px-4 py-3"><code>dot</code></td><td class="px-4 py-3 text-gray-400">dot.case</td><td class="px-4 py-3"><code>'hello.world'</code></td></tr>
+              <tr><td class="px-4 py-3"><code>path</code></td><td class="px-4 py-3 text-gray-400">path/case</td><td class="px-4 py-3"><code>'hello/world'</code></td></tr>
+              <tr><td class="px-4 py-3"><code>header</code></td><td class="px-4 py-3 text-gray-400">Header-Case</td><td class="px-4 py-3"><code>'Hello-World'</code></td></tr>
+              <tr><td class="px-4 py-3"><code>swap</code></td><td class="px-4 py-3 text-gray-400">sWAP cASE</td><td class="px-4 py-3"><code>'hELLO wORLD'</code></td></tr>
+              <tr><td class="px-4 py-3"><code>upper</code></td><td class="px-4 py-3 text-gray-400">UPPERCASE</td><td class="px-4 py-3"><code>'HELLO'</code></td></tr>
+              <tr><td class="px-4 py-3"><code>lower</code></td><td class="px-4 py-3 text-gray-400">lowercase</td><td class="px-4 py-3"><code>'hello'</code></td></tr>
+              <tr><td class="px-4 py-3"><code>capitalize</code></td><td class="px-4 py-3 text-gray-400">Capitalize</td><td class="px-4 py-3"><code>'Hello'</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <div class="mt-12 flex justify-between">
+      <a href="/docs/api/" class="text-primary hover:underline">&larr; API Overview</a>
+      <a href="/docs/api/manipulation.html" class="text-primary hover:underline">Manipulation &rarr;</a>
+    </div>
+  </main>
+
+  <script>Prism.highlightAll();</script>
+</body>
+</html>

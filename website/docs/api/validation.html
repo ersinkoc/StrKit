@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validation - StrKit API</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#6366f1' } } } }</script>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+  <style>pre[class*="language-"]{margin:0;border-radius:0.5rem;font-size:0.875rem;}</style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-lg border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center space-x-2">
+        <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span class="text-xl font-bold">StrKit</span>
+      </a>
+    </div>
+  </nav>
+
+  <main class="pt-24 pb-16 px-4 max-w-4xl mx-auto">
+    <nav class="text-sm text-gray-500 mb-4">
+      <a href="/docs/api/" class="hover:text-white">API</a> / <span class="text-gray-300">Validation</span>
+    </nav>
+
+    <h1 class="text-4xl font-bold mb-4">Validation</h1>
+    <p class="text-xl text-gray-400 mb-8">18 validators for common formats. All return boolean.</p>
+
+    <div class="space-y-8">
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Format Validators</h2>
+        <pre><code class="language-typescript">str.validate.email('test@example.com');         // true
+str.validate.url('https://example.com');        // true
+str.validate.uuid('550e8400-e29b-41d4-a716-446655440000'); // true
+str.validate.ip('192.168.1.1');                 // true
+str.validate.ipv4('192.168.1.1');               // true
+str.validate.ipv6('::1');                       // true
+str.validate.phone('+1-555-555-5555');          // true
+str.validate.creditCard('4111111111111111');    // true
+
+// Direct import with is* prefix
+import { isEmail, isUrl, isUuid } from '@oxog/strkit';
+isEmail('test@example.com');  // true
+
+// Chainable
+S('test@example.com').isEmail();  // true</code></pre>
+      </section>
+
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Content Validators</h2>
+        <pre><code class="language-typescript">str.validate.empty('');           // true
+str.validate.blank('   ');        // true (whitespace only)
+str.validate.alpha('hello');      // true
+str.validate.numeric('12345');    // true
+str.validate.alphanumeric('abc123'); // true
+str.validate.hex('ff00ff');       // true
+str.validate.base64('aGVsbG8=');  // true
+str.validate.json('{"key":"value"}'); // true
+str.validate.upperCase('HELLO');  // true
+str.validate.lowerCase('hello');  // true</code></pre>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-4">All Validators</h2>
+        <div class="grid md:grid-cols-2 gap-2 text-sm">
+          <div class="bg-gray-900 p-3 rounded"><code>isEmail</code> - Valid email format</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isUrl</code> - Valid URL</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isUuid</code> - Valid UUID</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isIp</code> - Valid IPv4 or IPv6</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isIpv4</code> - Valid IPv4</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isIpv6</code> - Valid IPv6</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isPhone</code> - Valid phone number</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isCreditCard</code> - Valid credit card (Luhn)</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isEmpty</code> - Empty string</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isBlank</code> - Empty or whitespace</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isAlpha</code> - Letters only</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isNumeric</code> - Numbers only</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isAlphanumeric</code> - Letters and numbers</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isHex</code> - Hexadecimal</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isBase64</code> - Base64 encoded</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isJson</code> - Valid JSON</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isUpperCase</code> - All uppercase</div>
+          <div class="bg-gray-900 p-3 rounded"><code>isLowerCase</code> - All lowercase</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="mt-12 flex justify-between">
+      <a href="/docs/api/manipulation.html" class="text-primary hover:underline">&larr; Manipulation</a>
+      <a href="/docs/api/sanitization.html" class="text-primary hover:underline">Sanitization &rarr;</a>
+    </div>
+  </main>
+  <script>Prism.highlightAll();</script>
+</body>
+</html>

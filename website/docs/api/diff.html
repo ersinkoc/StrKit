@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diff - StrKit API</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#6366f1' } } } }</script>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+  <style>pre[class*="language-"]{margin:0;border-radius:0.5rem;font-size:0.875rem;}</style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-lg border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center space-x-2">
+        <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span class="text-xl font-bold">StrKit</span>
+      </a>
+    </div>
+  </nav>
+
+  <main class="pt-24 pb-16 px-4 max-w-4xl mx-auto">
+    <nav class="text-sm text-gray-500 mb-4">
+      <a href="/docs/api/" class="hover:text-white">API</a> / <span class="text-gray-300">Diff</span>
+    </nav>
+
+    <h1 class="text-4xl font-bold mb-4">Diff</h1>
+    <p class="text-xl text-gray-400 mb-8">7 methods for text diffing and patching.</p>
+
+    <div class="space-y-8">
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Character Diff</h2>
+        <pre><code class="language-typescript">str.diff.diffChars('hello', 'hallo');
+// [
+//   { type: 'equal', value: 'h' },
+//   { type: 'remove', value: 'e' },
+//   { type: 'add', value: 'a' },
+//   { type: 'equal', value: 'llo' }
+// ]</code></pre>
+      </section>
+
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Word & Line Diff</h2>
+        <pre><code class="language-typescript">str.diff.diffWords('hello world', 'hello there world');
+// [
+//   { type: 'equal', value: 'hello ' },
+//   { type: 'add', value: 'there ' },
+//   { type: 'equal', value: 'world' }
+// ]
+
+str.diff.diffLines('line1\nline2', 'line1\nline3');
+// Line-level diff output</code></pre>
+      </section>
+
+      <section class="bg-gray-900 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Unified Patch</h2>
+        <pre><code class="language-typescript">// Create unified diff patch
+const patch = str.diff.createPatch('file.txt', 'old content', 'new content');
+// Returns unified diff format string
+
+// Apply patch
+const result = str.diff.applyPatch(originalText, patch);
+
+// Reverse patch
+const reverted = str.diff.reversePatch(patchedText, patch);</code></pre>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-4">All Methods</h2>
+        <div class="grid md:grid-cols-2 gap-2 text-sm">
+          <div class="bg-gray-900 p-3 rounded"><code>diffChars</code> - Character-level diff</div>
+          <div class="bg-gray-900 p-3 rounded"><code>diffWords</code> - Word-level diff</div>
+          <div class="bg-gray-900 p-3 rounded"><code>diffLines</code> - Line-level diff</div>
+          <div class="bg-gray-900 p-3 rounded"><code>diff</code> - Generic diff with options</div>
+          <div class="bg-gray-900 p-3 rounded"><code>createPatch</code> - Create unified patch</div>
+          <div class="bg-gray-900 p-3 rounded"><code>applyPatch</code> - Apply patch</div>
+          <div class="bg-gray-900 p-3 rounded"><code>reversePatch</code> - Reverse a patch</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="mt-12 flex justify-between">
+      <a href="/docs/api/pluralization.html" class="text-primary hover:underline">&larr; Pluralization</a>
+      <a href="/docs/api/search.html" class="text-primary hover:underline">Search &rarr;</a>
+    </div>
+  </main>
+  <script>Prism.highlightAll();</script>
+</body>
+</html>
