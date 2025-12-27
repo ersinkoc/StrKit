@@ -26,7 +26,13 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Build strkit library
+        run: npm run build
+
+      - name: Install website dependencies
         working-directory: ./website
         run: npm ci
 
